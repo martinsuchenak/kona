@@ -20,6 +20,10 @@
       "match": "\\bte,?\\b"
     },
     {
+      "name": "keyword.control.literal.kona",
+      "match": "\\b(nomi|fino)\\b"
+    },
+    {
       "name": "keyword.control.conditional.kona",
       "match": "\\b(si|ali|:else:)\\b"
     },
@@ -37,7 +41,7 @@
     },
     {
       "name": "variable.other.target.shorthand.kona",
-      "match": "@[a-zA-Z0-9_\\-\\.:\\(\\)\"]+"
+      "match": "@[a-zA-Z0-9_\\-]+"
     },
     {
       "name": "storage.modifier.kona",

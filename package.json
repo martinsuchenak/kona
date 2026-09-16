@@ -2,7 +2,7 @@
   "name": "kona-language",
   "displayName": "Kona Language Support",
   "description": "Language support, syntax highlighting, and snippets for the Kona functional agent language",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "kona-lang",
   "engines": {
     "vscode": "^1.70.0"
@@ -14,8 +14,13 @@
     "languages": [
       {
         "id": "kona",
-        "aliases": ["Kona", "kona"],
-        "extensions": [".kona"],
+        "aliases": [
+          "Kona",
+          "kona"
+        ],
+        "extensions": [
+          ".kona"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
