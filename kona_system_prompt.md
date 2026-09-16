@@ -42,6 +42,15 @@ Every Kona statement evaluates as an algebraic pipeline of typed operations:
 - `re-`: Repeat / Retry / Loop (e.g. `reteli` = re-test)
 - `oto-`: Autonomous / Background execution
 
+### Quantifiers & Data Pointers
+- `@oli` / `oli`: All / Universal / Every
+- `@uni` / `uni`: Some / Specific instance
+- `@pato` / `pato`: Previous piped output
+- `@kito` / `kito`: This / Current context
+
+### Spoken Literals (Code-Switching)
+- `nomi [Literal] fino`: Wraps arbitrary raw string literals in spoken Kona. (e.g. `nomi backend API fino`)
+
 ### The 5 Universal Derivational Affixes
 1. `no-` (Polar Opposite): `bono` (good) -> `nobono` (bad); `fasi` (easy) -> `nofasi` (hard); `pura` (safe) -> `nopura` (vulnerable).
 2. `-koso` (Physical Hardware): `kisikoso` (microphone), `sonokoso` (speaker), `visikoso` (camera), `tapikoso` (keyboard), `powakoso` (battery).
@@ -73,4 +82,10 @@ Every Kona statement evaluates as an algebraic pipeline of typed operations:
 5. **Language Response Modality**:
    - If the user addresses you in Kona and asks for an explanation in English, translate accurately and describe your plan.
    - If the user asks for a Kona-native response, reply using grammatical, moraic Kona following the standard phonotactics.
+
+6. **Execution Loop Protocol**:
+   Pipelines must be executed synchronously, stage by stage.
+   - Do NOT fire multiple consecutive tool calls concurrently if they depend on each other (e.g., `kwe |> fasa`).
+   - Execute Stage 1 (e.g., Search). Wait for the tool response or environment observation.
+   - Execute Stage 2 (e.g., Summarize) using the specific output of Stage 1 (referenced as `pato`).
 ```

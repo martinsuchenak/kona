@@ -188,266 +188,292 @@ SHORTHAND_FORMAT_MAP = {
 # 2. PARSER & AST BUILDER
 # ============================================================================
 
-class KonaPipeline:
-    def __init__(self, raw: str):
+
+class Token:
+    def __init__(self, type_: str, value: str, raw: str):
+        self.type = type_
+        self.value = value
         self.raw = raw
-        self.steps: List[Dict[str, Any]] = []
+    def __repr__(self):
+        return f"Token({self.type}, {self.raw})"
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "source_raw": self.raw,
-            "pipeline_length": len(self.steps),
-            "execution_steps": self.steps
-        }
+class Lexer:
+    def __init__(self, text: str):
+        self.text = text
+        self.tokens = []
+        self.tokenize()
+        self.pos = 0
 
-    def to_english(self) -> List[str]:
-        """Translates the parsed Kona pipeline into clear English steps."""
-        lines = []
-        for s in self.steps:
-            prefix = ""
-            if s.get("condition"):
-                prefix = f"IF ({s['condition']}) THEN: "
-            action = s["action"].capitalize()
-            mods = f" [{', '.join(s['modifiers'])}]" if s["modifiers"] else ""
-            targets = []
-            for t in s["targets"]:
-                t_str = f"@{t['type']}" + (f"('{t['value']}')" if t["value"] else "")
-                targets.append(t_str)
-            target_str = f" on {', '.join(targets)}" if targets else ""
-            args_str = f" with args {s['arguments']}" if s["arguments"] else ""
+    def tokenize(self):
+        rules = [
+            ("WHITESPACE", r'\s+'),
+            ("PIPE", r'\|>|te\s*,|te(?!\w)'),
+            ("LPAREN", r'\('),
+            ("RPAREN", r'\)'),
+            ("STRING", r'"[^"]*"|\'[^\']*\''),
+            ("NOMI", r'nomi\b'),
+            ("FINO", r'fino\b'),
+            ("SI", r'si\b'),
+            ("ALI", r'(ali|:else:)\b'),
+            ("GUARD", r'(![a-zA-Z_-]+|notori\b|no-[a-zA-Z_-]+)'),
+            ("TARGET_AT", r'@[a-zA-Z_-]+(:("[^"]*"|\'[^\']*\'))?'),
+            ("FORMAT_HASH", r'#(table|list|json|raw|diff)'),
+            ("WORD", r'[a-zA-Z_-]+')
+        ]
+        
+        scanner = re.compile('|'.join(f'(?P<{name}>{pattern})' for name, pattern in rules))
+        for match in scanner.finditer(self.text):
+            type_ = match.lastgroup
+            raw = match.group()
+            if type_ == "WHITESPACE": continue
             
-            guards = ""
-            if s["guards_prohibited"]:
-                guards = " (STRICT GUARD: DO NOT " + ", ".join(
-                    f"{g['action']} {g['target']}" for g in s["guards_prohibited"]
-                ) + ")"
-            
-            fmt = f" -> Format output as {s['output_format']}" if s["output_format"] else ""
-            else_branch = f" [ELSE: {s['alternative']}]" if s.get("alternative") else ""
-            lines.append(f"Step {s['step_index']}: {prefix}{action}{mods}{target_str}{args_str}{guards}{fmt}{else_branch}")
-        return lines
+            value = raw
+            if type_ == "STRING": 
+                value = raw[1:-1]
+            self.tokens.append(Token(type_, value, raw))
 
-    def to_tool_calls(self) -> List[Dict[str, Any]]:
-        """Compiles Kona pipeline into executable agent tool calls."""
-        calls = []
-        for s in self.steps:
-            tool_name = f"agent_{s['action']}"
-            params = {
-                "condition": s.get("condition"),
-                "modifiers": s["modifiers"],
-                "targets": s["targets"],
-                "arguments": s["arguments"],
-                "prohibited_invariants": s["guards_prohibited"],
-                "format": s["output_format"],
-                "else_branch": s.get("alternative")
-            }
-            calls.append({"tool": tool_name, "parameters": params})
+    def peek(self):
+        if self.pos < len(self.tokens): return self.tokens[self.pos]
+        return None
+
+    def consume(self, expected_type=None):
+        tok = self.peek()
+        if expected_type and (not tok or tok.type != expected_type):
+            raise SyntaxError(f"SyntaxError: Expected {expected_type}, got {tok.type if tok else 'EOF'} at '{tok.raw if tok else ''}'")
+        if tok: self.pos += 1
+        return tok
+
+class ASTNode:
+    def to_english(self) -> List[str]: raise NotImplementedError()
+    def to_tool_calls(self) -> List[Dict]: raise NotImplementedError()
+
+class PipelineNode(ASTNode):
+    def __init__(self, stages):
+        self.stages = stages
+    def to_english(self):
+        out = []
+        for i, s in enumerate(self.stages):
+            eng = s.to_english()
+            if i > 0:
+                out.append("THEN: " + eng[0])
+                out.extend(eng[1:])
+            else:
+                out.extend(eng)
+        return out
+    def to_tool_calls(self):
+        out = []
+        for s in self.stages:
+            out.extend(s.to_tool_calls())
+        return out
+
+class StageNode(ASTNode):
+    def __init__(self, body, condition=None, else_branch=None):
+        self.body = body
+        self.condition = condition
+        self.else_branch = else_branch
+
+    def to_english(self):
+        out = []
+        cond_str = ""
+        if self.condition:
+            cond_str = f"IF ({' '.join(self.condition)}) -> "
+        
+        body_eng = self.body.to_english()
+        
+        if cond_str:
+            out.append(f"{cond_str}{body_eng[0]}")
+            out.extend([f"  {line}" for line in body_eng[1:]])
+        else:
+            out.extend(body_eng)
+            
+        if self.else_branch:
+            else_eng = self.else_branch.to_english()
+            out.append(f"ELSE: {else_eng[0]}")
+            out.extend([f"  {line}" for line in else_eng[1:]])
+        return out
+
+    def to_tool_calls(self):
+        calls = self.body.to_tool_calls()
+        if self.condition:
+            for c in calls:
+                c["parameters"]["condition"] = " ".join(self.condition)
+        if self.else_branch:
+            else_calls = self.else_branch.to_tool_calls()
+            for ec in else_calls:
+                ec["parameters"]["condition"] = f"NOT ({' '.join(self.condition)})"
+            calls.extend(else_calls)
         return calls
 
-def parse_kona(text: str) -> KonaPipeline:
-    """
-    Parses both Spoken Kona and Written Shorthand into a normalized pipeline AST.
-    Pipeline delimiters:
-      - Written shorthand: '|>'
-      - Spoken Kona: 'te,' or 'te ' (consecutive action connector)
-    """
-    text = text.strip()
-    pipeline = KonaPipeline(text)
+class ActionNode(ASTNode):
+    def __init__(self, action, modifiers, targets, guards, formats):
+        self.action = action
+        self.modifiers = modifiers
+        self.targets = targets
+        self.guards = guards
+        self.formats = formats
+        
+    def to_english(self):
+        act_desc = ACTIONS.get(self.action, {"name": self.action})["name"].upper()
+        if self.modifiers:
+            mod_desc = " ".join([m for m in self.modifiers])
+            act_desc = f"[{mod_desc}] {act_desc}"
+            
+        t_desc = []
+        for t in self.targets:
+            if t["type"] == "literal":
+                t_desc.append(f"'{t['args']}'")
+            else:
+                base = t["type"]
+                desc = TARGETS.get(base, base)
+                if t["args"]:
+                    desc += f" (args: {t['args']})"
+                t_desc.append(desc)
+                
+        line = f"Execute {act_desc} on targets: {', '.join(t_desc) if t_desc else 'implicit'}"
+        out = [line]
+        if self.guards:
+            out.append(f"Constraints: prohibited invariants -> {', '.join(self.guards)}")
+        if self.formats:
+            out.append(f"Output Format: {', '.join(self.formats)}")
+        return out
 
-    # Detect pipe splitters: '|>' or spoken particle 'te' (with optional comma)
-    if "|>" in text:
-        raw_stages = [s.strip() for s in text.split("|>")]
-    else:
-        # Split on 'te' preceded and followed by word boundaries/punctuation
-        raw_stages = [s.strip() for s in re.split(r'[\s,]+te[\s,]+|\bte\b', text)]
+    def to_tool_calls(self):
+        return [{
+            "tool": f"agent_{ACTIONS.get(self.action, {"name": self.action})["name"].lower()}",
+            "parameters": {
+                "modifiers": self.modifiers,
+                "targets": self.targets,
+                "prohibited_invariants": self.guards,
+                "format_requested": self.formats,
+                "condition": None
+            }
+        }]
 
-    i = 0
-    while i < len(raw_stages):
-        stage = raw_stages[i]
-        if not stage:
-            i += 1
-            continue
+class Parser:
+    def __init__(self, lexer: Lexer):
+        self.lexer = lexer
 
-        # Check if stage is a conditional prefix: 'si [cond]'
-        if stage.startswith("si ") or stage.startswith("si:"):
-            cond_text = stage[3:].strip()
-            i += 1
-            if i < len(raw_stages):
-                next_stage = raw_stages[i]
-                alt = None
-                if " ali " in next_stage:
-                    main_act, alt = next_stage.split(" ali ", 1)
-                elif " :else: " in next_stage:
-                    main_act, alt = next_stage.split(" :else: ", 1)
+    def parse(self):
+        return self.parse_pipeline()
+
+    def parse_pipeline(self):
+        stages = []
+        stages.append(self.parse_stage())
+        while self.lexer.peek() and self.lexer.peek().type == "PIPE":
+            self.lexer.consume("PIPE")
+            stages.append(self.parse_stage())
+        return PipelineNode(stages)
+
+    def parse_stage(self):
+        condition = None
+        else_branch = None
+        
+        if self.lexer.peek() and self.lexer.peek().type == "SI":
+            self.lexer.consume("SI")
+            condition = []
+            while self.lexer.peek() and self.lexer.peek().type not in ("PIPE",):
+                tok = self.lexer.consume()
+                if tok.raw == ":": break
+                condition.append(tok.raw)
+            if self.lexer.peek() and self.lexer.peek().type == "PIPE":
+                self.lexer.consume("PIPE")
+                
+        if self.lexer.peek() and self.lexer.peek().type == "LPAREN":
+            self.lexer.consume("LPAREN")
+            body = self.parse_pipeline()
+            self.lexer.consume("RPAREN")
+        else:
+            body = self.parse_action_expr()
+            
+        if self.lexer.peek() and self.lexer.peek().type == "ALI":
+            self.lexer.consume("ALI")
+            else_branch = self.parse_stage()
+            
+        return StageNode(body, condition, else_branch)
+
+    def parse_action_expr(self):
+        action = None
+        modifiers = []
+        targets = []
+        guards = []
+        formats = []
+        
+        while self.lexer.peek() and self.lexer.peek().type not in ("PIPE", "ALI", "RPAREN"):
+            tok = self.lexer.consume()
+            
+            if tok.type == "WORD":
+                val = tok.raw
+                if val in FORMATS:
+                    formats.append(FORMATS[val])
+                    continue
+                if val in MODIFIERS:
+                    modifiers.append(MODIFIERS[val])
+                    continue
+                if val in TARGETS:
+                    targets.append({"type": val, "args": None})
+                    continue
+                    
+                if "." in val:
+                    parts = val.split(".")
+                    val = parts[0]
+                    for p in parts[1:]:
+                        if p in MODIFIERS: modifiers.append(MODIFIERS[p])
+                elif "-" in val:
+                    parts = val.split("-")
+                    val = parts[-1]
+                    for p in parts[:-1]:
+                        if p in MODIFIERS: modifiers.append(MODIFIERS[p])
                 else:
-                    main_act = next_stage
-                step = parse_stage(main_act, len(pipeline.steps))
-                step["condition"] = cond_text
-                step["alternative"] = alt.strip() if alt else None
-                pipeline.steps.append(step)
-                i += 1
-                continue
-        
-        step = parse_stage(stage, len(pipeline.steps))
-        pipeline.steps.append(step)
-        i += 1
+                    for m in sorted(MODIFIERS.keys(), key=len, reverse=True):
+                        if val.startswith(m) and val[len(m):] in ACTIONS:
+                            modifiers.append(MODIFIERS[m])
+                            val = val[len(m):]
+                            break
+                            
+                if val in ACTIONS:
+                    action = val
+                else:
+                    targets.append({"type": "literal", "args": val})
+                    
+            elif tok.type == "TARGET_AT":
+                t = tok.raw[1:]
+                arg = None
+                if ":" in t:
+                    parts = t.split(":", 1)
+                    t = parts[0]
+                    arg = parts[1].strip("\"'")
+                targets.append({"type": t, "args": arg})
+            elif tok.type == "FORMAT_HASH":
+                formats.append(SHORTHAND_FORMAT_MAP[tok.raw])
+            elif tok.type == "GUARD":
+                if tok.raw.startswith("!"): guards.append(tok.raw[1:])
+                elif tok.raw.startswith("notori"):
+                    nxt = self.lexer.peek()
+                    if nxt and nxt.type in ("WORD", "STRING"):
+                        guards.append(self.lexer.consume().value)
+                    else:
+                        guards.append("general")
+                elif tok.raw.startswith("no-"): guards.append(tok.raw[3:])
+                else: guards.append(tok.raw)
+            elif tok.type == "NOMI":
+                literal_parts = []
+                while self.lexer.peek() and self.lexer.peek().type != "FINO":
+                    literal_parts.append(self.lexer.consume().raw)
+                if self.lexer.peek() and self.lexer.peek().type == "FINO":
+                    self.lexer.consume("FINO")
+                targets.append({"type": "literal", "args": " ".join(literal_parts)})
+            elif tok.type == "STRING":
+                targets.append({"type": "literal", "args": tok.value})
+                
+        if not action:
+            action = "yuki" # fallback implicit action
+            
+        return ActionNode(action, modifiers, targets, guards, formats)
 
-    return pipeline
-
-def parse_stage(stage: str, index: int) -> Dict[str, Any]:
-    condition = None
-    alternative = None
-
-    # Check for conditional: si [condition] ... ali [alternative]
-    if stage.startswith("si ") or stage.startswith("si:"):
-        # Check for alternative branch
-        if " ali " in stage:
-            parts = stage.split(" ali ", 1)
-            stage_main = parts[0]
-            alternative = parts[1].strip()
-        elif " :else: " in stage:
-            parts = stage.split(" :else: ", 1)
-            stage_main = parts[0]
-            alternative = parts[1].strip()
-        else:
-            stage_main = stage
-        
-        # Extract condition: first 2-3 words after 'si'
-        cond_tokens = split_tokens(stage_main)
-        if len(cond_tokens) > 2:
-            condition = f"{cond_tokens[1]} {cond_tokens[2]}"
-            # The remaining tokens represent the action
-            stage = " ".join(cond_tokens[3:]) if len(cond_tokens) > 3 else cond_tokens[1]
-        else:
-            condition = cond_tokens[1] if len(cond_tokens) > 1 else "true"
-            stage = " ".join(cond_tokens[2:])
-
-    tokens = split_tokens(stage)
-    
-    action_info = {"verb": None, "modifiers": []}
-    targets = []
-    literals = []
-    guards_prohibited = []
-    out_format = None
-
-    i = 0
-    while i < len(tokens):
-        tok = tokens[i]
-
-        # 1. Check for negative guards: e.g. !tori @"auth", no-tori "auth", or bound notori "auth"
-        if tok.startswith("!") or tok.startswith("no-") or (tok.startswith("no") and tok[2:] in ACTIONS):
-            if tok.startswith("!"):
-                guard_verb = tok.lstrip("!")
-            elif tok.startswith("no-"):
-                guard_verb = tok.replace("no-", "")
-            else:
-                guard_verb = tok[2:]
-            i += 1
-            guard_target = tokens[i] if i < len(tokens) else None
-            guards_prohibited.append({
-                "action": guard_verb,
-                "target": clean_literal(guard_target) if guard_target else None
-            })
-            i += 1
-            continue
-
-        # 2. Check for format markers: #table, #json or mesa, jano
-        if tok in SHORTHAND_FORMAT_MAP:
-            out_format = SHORTHAND_FORMAT_MAP[tok]
-            i += 1
-            continue
-        if tok in FORMATS:
-            out_format = FORMATS[tok]
-            i += 1
-            continue
-
-        # 3. Check for shorthand targets: @repo, @code, @file("...")
-        if any(tok.startswith(prefix) for prefix in SHORTHAND_TARGET_MAP):
-            for prefix, mapped in SHORTHAND_TARGET_MAP.items():
-                if tok.startswith(prefix):
-                    val = tok[len(prefix):].lstrip(":").strip("()\"'")
-                    if not val and i + 1 < len(tokens) and (tokens[i+1].startswith('"') or tokens[i+1].startswith("'")):
-                        i += 1
-                        val = clean_literal(tokens[i])
-                    targets.append({"type": mapped, "value": val if val else None})
-                    break
-            i += 1
-            continue
-
-        # 4. Check for actions with modifiers:
-        # e.g., 'de-kwe', 'kwe.de', 've-tori', 'tori.ve', 'kwe'
-        base_verb, mods = extract_verb_and_modifiers(tok)
-        if base_verb in ACTIONS:
-            action_info["verb"] = ACTIONS[base_verb]["name"]
-            action_info["modifiers"].extend(mods)
-            i += 1
-            continue
-
-        # 5. Check for plain targets (spoken): kodo, fili, veba
-        if tok in TARGETS:
-            target_type = TARGETS[tok]
-            # Check if next token is a string literal argument
-            if i + 1 < len(tokens) and (tokens[i+1].startswith('"') or tokens[i+1].startswith("'")):
-                i += 1
-                targets.append({"type": target_type, "value": clean_literal(tokens[i])})
-            else:
-                targets.append({"type": target_type, "value": None})
-            i += 1
-            continue
-
-        # 6. Fallback string literals
-        if tok.startswith('"') or tok.startswith("'"):
-            literals.append(clean_literal(tok))
-            i += 1
-            continue
-
-        # General literal / identifier
-        literals.append(tok)
-        i += 1
-
-    return {
-        "step_index": index + 1,
-        "action": action_info["verb"] or "process",
-        "modifiers": action_info["modifiers"],
-        "targets": targets,
-        "arguments": literals,
-        "guards_prohibited": guards_prohibited,
-        "output_format": out_format
-    }
-
-def split_tokens(s: str) -> List[str]:
-    pattern = r'[!#@]?[\w\.\-]+|\"[^\"]*\"|\'[^\']*\''
-    return re.findall(pattern, s)
-
-def clean_literal(s: str) -> str:
-    return s.strip("\"'")
-
-def extract_verb_and_modifiers(tok: str):
-    mods = []
-    # 1. Check dot shorthand: kwe.de, tori.ve
-    if "." in tok:
-        parts = tok.split(".")
-        verb = parts[0]
-        for m in parts[1:]:
-            if m in MODIFIERS:
-                mods.append(MODIFIERS[m])
-        return verb, mods
-    
-    # 2. Check hyphenated notation: de-kwe, su-fasa
-    if "-" in tok:
-        parts = tok.split("-")
-        verb = parts[-1]
-        for p in parts[:-1]:
-            if p in MODIFIERS:
-                mods.append(MODIFIERS[p])
-        return verb, mods
-
-    # 3. Check bound morpheme prefix: dekwe, vetori, sufasa, sunodata
-    for m in sorted(MODIFIERS.keys(), key=len, reverse=True):
-        if tok.startswith(m) and tok[len(m):] in ACTIONS:
-            return tok[len(m):], [MODIFIERS[m]]
-
-    return tok, []
+def parse_kona(text: str) -> ASTNode:
+    lexer = Lexer(text)
+    parser = Parser(lexer)
+    return parser.parse()
 
 # ============================================================================
 # 3. ACOUSTIC ENGINE (Speech Synthesis via macOS)

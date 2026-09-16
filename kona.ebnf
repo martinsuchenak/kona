@@ -26,7 +26,10 @@ SpokenPipe
 
 (* --- 2. Pipeline Stages & Execution Units --- *)
 PipelineStage
-    = [ ConditionalPrefix ] , StageBody , [ AlternativeBranch ] ;
+    = [ ConditionalPrefix ] , ( StageBody | NestedPipeline ) , [ AlternativeBranch ] ;
+
+NestedPipeline
+    = "(" , [ Whitespace ] , Pipeline , [ Whitespace ] , ")" ;
 
 ConditionalPrefix
     = "si" , Whitespace , Expression , ( SpokenPipe | ":" ) ;
@@ -176,6 +179,11 @@ BaseTarget
     | "ona"      (* external / third-party *)
     | "koli"     (* team / collective *)
     | "yoti"     (* person / user *)
+    (* Quantifiers & Pointers *)
+    | "oli"      (* all / every *)
+    | "uni"      (* some / specific *)
+    | "pato"     (* previous output *)
+    | "kito"     (* this / current *)
     ;
 
 CompoundTarget
@@ -229,11 +237,15 @@ Expression
 
 LiteralValue
     = StringLiteral
+    | SpokenLiteral
     | NumberLiteral ;
 
 StringLiteral
     = '"' , { ? any character except quote ? } , '"'
     | "'" , { ? any character except single quote ? } , "'" ;
+
+SpokenLiteral
+    = "nomi" , [ Whitespace ] , { ? any character or word ? } , [ Whitespace ] , "fino" ;
 
 NumberLiteral
     = Digit , { Digit } , [ "." , Digit , { Digit } ] ;

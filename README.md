@@ -82,6 +82,21 @@ Kona includes TextMate syntax highlighting for VS Code and compatible editors:
 - Config: [`language-configuration.json`](language-configuration.json)
 - Sample: [`example.kona`](example.kona)
 
+### VS Code Installation
+
+To install the local extension for VS Code:
+```bash
+# 1. Create a local extension directory
+mkdir -p ~/.vscode/extensions/kona-lang
+
+# 2. Copy the extension files over
+cp package.json ~/.vscode/extensions/kona-lang/
+cp language-configuration.json ~/.vscode/extensions/kona-lang/
+cp -r syntaxes ~/.vscode/extensions/kona-lang/
+
+# 3. Reload VS Code (Cmd+Shift+P -> "Developer: Reload Window")
+```
+
 ---
 
 ## Proven Benchmarks

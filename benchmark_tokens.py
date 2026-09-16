@@ -141,8 +141,8 @@ def run_benchmark():
         # Verify parser accepts written shorthand and spoken forms
         p_spk = parse_kona(task["kona_spoken"])
         p_wrt = parse_kona(task["kona_written"])
-        assert len(p_spk.steps) > 0
-        assert len(p_wrt.steps) > 0
+        assert len(p_spk.stages) > 0
+        assert len(p_wrt.stages) > 0
 
         row = f"{task['name']:<32} | {en_tok:<7} | {spk_tok:<9} | {wrt_tok:<9} | -{tok_saved_pct:>5.1f}%      | -{char_saved_pct:>5.1f}%"
         print(row)

@@ -234,7 +234,33 @@ Using **`sono`** (sound/volume) and **`luce`** (light):
 
 ---
 
-## 11. General Action Primitives (Verbs & Modals)
+## 11. Quantifiers & Data Pointers
+
+High-stakes commands (like deletions or refactors) require exact blast-radius constraints.
+
+| Kona Root | IPA | Meaning | Written Shorthand |
+| :--- | :--- | :--- | :--- |
+| **`oli`** | /'o.li/ | All, every, universal | `@all` |
+| **`uni`** | /'u.ni/ | Some, one, a specific instance | `@some` |
+| **`pato`** | /'pa.to/ | The previous output / piped data | `@prev` |
+| **`kito`** | /'ki.to/ | This, the current context | `@this` |
+
+---
+
+## 12. Spoken Literals (Code-Switching)
+
+When speaking Kona, you often need to pass arbitrary English strings, git hashes, or passwords that do not follow Kona phonotactics. Use these boundary particles to tell the ASR and parser to treat the enclosed audio as a raw string literal.
+
+| Kona Root | IPA | Meaning | Written Equivalent |
+| :--- | :--- | :--- | :--- |
+| **`nomi`** | /'no.mi/ | Start of raw literal / Name | `"` (Opening quote) |
+| **`fino`** | /'fi.no/ | End of raw literal | `"` (Closing quote) |
+
+*Example:* `kwe poya nomi backend API fino te, fasa mesa` (Search repo "backend API", format as table).
+
+---
+
+## 13. General Action Primitives (Verbs & Modals)
 
 | Kona Root | IPA | Meaning | Written Shorthand |
 | :--- | :--- | :--- | :--- |
