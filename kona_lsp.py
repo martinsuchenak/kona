@@ -48,17 +48,26 @@ def add_completion(word, detail, documentation, kind):
     )
     hover_dict[word] = f"**{detail}**\n\n{documentation}"
 
+
+prefixes = ["de", "su", "ve", "re", "no"]
+aspects = ["ba", "ta", "sa"]
+
 for word, info in ACTIONS.items():
     if isinstance(info, dict):
         add_completion(word, f"Action: {info['name']}", info['desc'], 3)
+        add_completion(word + "na", f"Nominalized: {info['name']}", info['desc'], 6)
+        for asp in aspects:
+            add_completion(word + asp, f"Action (+{asp}): {info['name']}", info['desc'], 3)
+        for pref in prefixes:
+            add_completion(pref + word, f"Modified Action ({pref}+): {info['name']}", info['desc'], 3)
 
 for word, desc in TARGETS.items():
     add_completion(word, f"Target: {desc}", "", 6)
+    for pref in prefixes:
+        add_completion(pref + word, f"Modified Target ({pref}+): {desc}", "", 6)
 
 for word, desc in MODIFIERS.items():
     add_completion(word, f"Modifier: {desc}", "", 14)
-
-
 @server.feature(TEXT_DOCUMENT_COMPLETION)
 def completions(params: CompletionParams) -> CompletionList:
     """Returns syntax completions."""
