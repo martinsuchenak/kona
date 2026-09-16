@@ -49,22 +49,27 @@ def add_completion(word, detail, documentation, kind):
     hover_dict[word] = f"**{detail}**\n\n{documentation}"
 
 
+
 prefixes = ["de", "su", "ve", "re", "no"]
-aspects = ["ba", "ta", "sa"]
+aspects_dict = {"ba": "Progressive", "ta": "Perfective", "sa": "Prospective"}
 
 for word, info in ACTIONS.items():
     if isinstance(info, dict):
         add_completion(word, f"Action: {info['name']}", info['desc'], 3)
-        add_completion(word + "na", f"Nominalized: {info['name']}", info['desc'], 6)
-        for asp in aspects:
-            add_completion(word + asp, f"Action (+{asp}): {info['name']}", info['desc'], 3)
+        add_completion(word + "na", f"Nominalized (Noun): {info['name']}", info['desc'], 6)
+        
+        for asp_key, asp_desc in aspects_dict.items():
+            add_completion(word + asp_key, f"Action [{asp_desc}]: {info['name']}", info['desc'], 3)
+            
         for pref in prefixes:
-            add_completion(pref + word, f"Modified Action ({pref}+): {info['name']}", info['desc'], 3)
+            mod_desc = MODIFIERS.get(pref, pref)
+            add_completion(pref + word, f"Action [{mod_desc.upper()}]: {info['name']}", info['desc'], 3)
 
 for word, desc in TARGETS.items():
     add_completion(word, f"Target: {desc}", "", 6)
     for pref in prefixes:
-        add_completion(pref + word, f"Modified Target ({pref}+): {desc}", "", 6)
+        mod_desc = MODIFIERS.get(pref, pref)
+        add_completion(pref + word, f"Target [{mod_desc.upper()}]: {desc}", "", 6)
 
 for word, desc in MODIFIERS.items():
     add_completion(word, f"Modifier: {desc}", "", 14)
