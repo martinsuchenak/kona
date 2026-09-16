@@ -1,0 +1,9 @@
+.git/
+whisper-env/
+lsp-env/
+node_modules/
+.npm/
+__pycache__/
+*.wav
+*.aiff
+*.vsix

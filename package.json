@@ -5,7 +5,7 @@
   "version": "0.1.1",
   "publisher": "kona-lang",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Programming Languages"
@@ -31,5 +31,34 @@
         "path": "./syntaxes/kona.tmLanguage.json"
       }
     ]
-  }
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc -p ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinsuchenak/kona.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/martinsuchenak/kona/issues"
+  },
+  "homepage": "https://github.com/martinsuchenak/kona#readme",
+  "dependencies": {
+    "vscode-languageclient": "^10.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.3",
+    "@types/vscode": "^1.70.0",
+    "@vscode/vsce": "^4.0.0",
+    "typescript": "^7.0.2"
+  },
+  "activationEvents": [
+    "onLanguage:kona"
+  ]
 }
