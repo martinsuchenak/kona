@@ -17,7 +17,8 @@ from lsprotocol.types import (
     Position,
     Range,
     DidChangeTextDocumentParams,
-    DidOpenTextDocumentParams
+    DidOpenTextDocumentParams,
+    PublishDiagnosticsParams
 )
 
 try:
@@ -124,10 +125,11 @@ def validate_document(ls, uri):
     except Exception:
         pass
 
-    ls.publish_diagnostics(uri, diagnostics)
+    ls.text_document_publish_diagnostics(PublishDiagnosticsParams(uri=uri, diagnostics=diagnostics))
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
-def did_open(ls, params: DidOpenTextDocumentParams):
+def did_open(ls, params: DidOpenTextDocumentParams,
+    PublishDiagnosticsParams):
     validate_document(ls, params.text_document.uri)
 
 @server.feature(TEXT_DOCUMENT_DID_CHANGE)
