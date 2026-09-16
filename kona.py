@@ -43,6 +43,11 @@ ACTIONS = {
     "veni":  {"name": "arrive",    "desc": "Arrive/Come/Approach"},
     "peli":  {"name": "delay",     "desc": "Delay/Postpone/Defer"},
     "tapi":  {"name": "type",      "desc": "Type/Keystroke/Input"},
+    # Ext: Workflow & Git
+    "yalo":  {"name": "approve",   "desc": "Approve/Accept/Merge"},
+    "nolo":  {"name": "reject",    "desc": "Reject/Block/Revert"},
+    "koma":  {"name": "compare",   "desc": "Compare/Diff"},
+    "fiso":  {"name": "fix",       "desc": "Fix/Patch/Resolve"},
     "kiri":  {"name": "write",     "desc": "Write/Author/Draft"},
 }
 
@@ -97,6 +102,43 @@ TARGETS = {
     # Web & Network
     "veba": "web",
     "peji": "page_url",
+    # Ext: Cloud & DevOps
+    "kusa": "cluster_node",
+    "fuka": "container_pod",
+    "rogi": "log_trace",
+    "pota": "port_endpoint",
+    "toka": "token_key",
+    
+    # Ext: Code Types
+    "fumo": "function_method",
+    "vari": "variable_state",
+    "kila": "class_module",
+    "raya": "array_list",
+    "sito": "string_text",
+    
+    # Ext: UI & Web
+    "buta": "button_element",
+    "foma": "input_form",
+    "pika": "image_media",
+    "wina": "window_modal",
+    
+    # Ext: Debugging & Config
+    "fogo": "error_crash",
+    "mori": "root_cause",
+    "simo": "symptom_metric",
+    "tuma": "memory_dump",
+    "figa": "configuration",
+    "rego": "rule_policy",
+    "vito": "state_mode",
+    
+    # Ext: Real World / Physical
+    "moni": "money_cost",
+    "teka": "building_office",
+    "karo": "vehicle_transport",
+    "nami": "food_sustenance",
+    "misu": "water_liquid",
+    "liba": "document_book",
+    "wela": "location_coordinates",
     "liki": "link",
     "neto": "network_api",
     # Data & Knowledge
