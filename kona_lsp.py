@@ -1,5 +1,5 @@
 import re
-from pygls.server import LanguageServer
+from pygls.lsp.server import LanguageServer
 from lsprotocol.types import (
     TEXT_DOCUMENT_COMPLETION,
     TEXT_DOCUMENT_HOVER,
