@@ -187,7 +187,11 @@ BaseTarget
     ;
 
 CompoundTarget
-    = BaseTarget , AffixSuffix ;
+    = BaseTarget , AffixSuffix
+    | NominalizedTarget ;
+
+NominalizedTarget
+    = BaseAction , "na" ;
 
 AffixSuffix
     = "koso"     (* physical device: kisikoso, tapikoso *)

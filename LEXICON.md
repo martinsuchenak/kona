@@ -260,7 +260,19 @@ When speaking Kona, you often need to pass arbitrary English strings, git hashes
 
 ---
 
-## 13. General Action Primitives (Verbs & Modals)
+---
+
+## 13. Grammatical Aspect (State Enums)
+
+Unlike tense (past/future), Aspect defines the *state of completion* of an action. These attach as suffixes to action verbs.
+
+| Kona Suffix | IPA | Meaning (Aspect) | English Analog |
+| :--- | :--- | :--- | :--- |
+| **`-ba`** | /ba/ | Progressive (Ongoing, currently happening) | "is searching" (`kweba`) |
+| **`-ta`** | /ta/ | Perfective (Completed, finished) | "has searched" (`kweta`) |
+| **`-sa`** | /sa/ | Habitual (Continuous, always does) | "routinely searches" (`kwesa`) |
+
+## 14. General Action Primitives (Verbs & Modals)
 
 | Kona Root | IPA | Meaning | Written Shorthand |
 | :--- | :--- | :--- | :--- |

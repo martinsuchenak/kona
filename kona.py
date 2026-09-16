@@ -305,15 +305,24 @@ class StageNode(ASTNode):
         return calls
 
 class ActionNode(ASTNode):
-    def __init__(self, action, modifiers, targets, guards, formats):
+    def __init__(self, action, modifiers, targets, guards, formats, aspect=None):
         self.action = action
         self.modifiers = modifiers
         self.targets = targets
         self.guards = guards
         self.formats = formats
+        self.aspect = aspect
         
     def to_english(self):
         act_desc = ACTIONS.get(self.action, {"name": self.action})["name"].upper()
+        
+        if self.aspect == "progressive":
+            act_desc = "CURRENTLY " + act_desc + "-ING"
+        elif self.aspect == "perfective":
+            act_desc = "FINISHED " + act_desc
+        elif self.aspect == "habitual":
+            act_desc = "HABITUALLY " + act_desc
+
         if self.modifiers:
             mod_desc = " ".join([m for m in self.modifiers])
             act_desc = f"[{mod_desc}] {act_desc}"
@@ -340,7 +349,8 @@ class ActionNode(ASTNode):
     def to_tool_calls(self):
         return [{
             "tool": f"agent_{ACTIONS.get(self.action, {"name": self.action})["name"].lower()}",
-            "parameters": {
+                        "parameters": {
+                "aspect": self.aspect,
                 "modifiers": self.modifiers,
                 "targets": self.targets,
                 "prohibited_invariants": self.guards,
@@ -393,6 +403,7 @@ class Parser:
 
     def parse_action_expr(self):
         action = None
+        aspect = None
         modifiers = []
         targets = []
         guards = []
@@ -413,6 +424,11 @@ class Parser:
                     targets.append({"type": val, "args": None})
                     continue
                     
+                # Check nominalization
+                if val.endswith("na") and val[:-2] in ACTIONS:
+                    targets.append({"type": "nominalization", "args": val[:-2]})
+                    continue
+
                 if "." in val:
                     parts = val.split(".")
                     val = parts[0]
@@ -425,10 +441,20 @@ class Parser:
                         if p in MODIFIERS: modifiers.append(MODIFIERS[p])
                 else:
                     for m in sorted(MODIFIERS.keys(), key=len, reverse=True):
-                        if val.startswith(m) and val[len(m):] in ACTIONS:
-                            modifiers.append(MODIFIERS[m])
-                            val = val[len(m):]
-                            break
+                        # Avoid prematurely matching modifier if it is nominalization (handled above) or aspect
+                        if val.startswith(m):
+                            rest = val[len(m):]
+                            if rest in ACTIONS or (rest.endswith("ba") and rest[:-2] in ACTIONS) or (rest.endswith("ta") and rest[:-2] in ACTIONS) or (rest.endswith("sa") and rest[:-2] in ACTIONS):
+                                modifiers.append(MODIFIERS[m])
+                                val = rest
+                                break
+                                
+                # Check aspect
+                for asp_suf, asp_name in [("ba", "progressive"), ("ta", "perfective"), ("sa", "habitual")]:
+                    if val.endswith(asp_suf) and val[:-2] in ACTIONS:
+                        aspect = asp_name
+                        val = val[:-2]
+                        break
                             
                 if val in ACTIONS:
                     action = val
@@ -468,7 +494,7 @@ class Parser:
         if not action:
             action = "yuki" # fallback implicit action
             
-        return ActionNode(action, modifiers, targets, guards, formats)
+        return ActionNode(action, modifiers, targets, guards, formats, aspect)
 
 def parse_kona(text: str) -> ASTNode:
     lexer = Lexer(text)

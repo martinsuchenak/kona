@@ -51,12 +51,19 @@ Every Kona statement evaluates as an algebraic pipeline of typed operations:
 ### Spoken Literals (Code-Switching)
 - `nomi [Literal] fino`: Wraps arbitrary raw string literals in spoken Kona. (e.g. `nomi backend API fino`)
 
-### The 5 Universal Derivational Affixes
+### The 6 Universal Derivational Affixes
 1. `no-` (Polar Opposite): `bono` (good) -> `nobono` (bad); `fasi` (easy) -> `nofasi` (hard); `pura` (safe) -> `nopura` (vulnerable).
 2. `-koso` (Physical Hardware): `kisikoso` (microphone), `sonokoso` (speaker), `visikoso` (camera), `tapikoso` (keyboard), `powakoso` (battery).
 3. `-peji` (Display / Surface): `visipeji` (screen/monitor), `mesapeji` (spreadsheet).
 4. `-kaba` (Environment): `kodokaba` (IDE workspace), `delikaba` (sandbox container), `datakaba` (data warehouse).
 5. `-yoti` (Specialist): `kodoyoti` (developer), `makiyoti` (designer/creator), `teliyoti` (QA tester).
+6. `-na` (Nominalization): Casts an Action to a Target concept. `kwe` (search) -> `kwena` (a query).
+
+### Grammatical Aspect (State)
+Actions can take aspectual suffixes to denote their state of completion:
+- `-ba` (Progressive): Action is currently ongoing (e.g., `yukiba` = currently executing).
+- `-ta` (Perfective): Action has finished (e.g., `yukita` = finished executing).
+- `-sa` (Habitual): Action happens routinely (e.g., `yukisa` = routinely executes).
 
 ### Modalities
 - Spoken Connector: `te,` (evaluates left-to-right actions).

@@ -65,5 +65,22 @@ class TestKonaParser(unittest.TestCase):
         self.assertEqual(calls[2]["tool"], "agent_summarize")
         self.assertIn("json", calls[2]["parameters"]["format_requested"])
 
+
+    def test_grammatical_aspect(self):
+        code = "yukiba te, makita te, fasasa"
+        pipeline = parse_kona(code)
+        self.assertEqual(len(pipeline.stages), 3)
+        self.assertEqual(pipeline.stages[0].body.aspect, "progressive")
+        self.assertEqual(pipeline.stages[1].body.aspect, "perfective")
+        self.assertEqual(pipeline.stages[2].body.aspect, "habitual")
+
+    def test_nominalization(self):
+        code = "tori kwena"
+        pipeline = parse_kona(code)
+        self.assertEqual(len(pipeline.stages), 1)
+        self.assertEqual(pipeline.stages[0].body.action, "tori")
+        self.assertEqual(pipeline.stages[0].body.targets[0]["type"], "nominalization")
+        self.assertEqual(pipeline.stages[0].body.targets[0]["args"], "kwe")
+
 if __name__ == "__main__":
     unittest.main()
