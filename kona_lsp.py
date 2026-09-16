@@ -128,8 +128,7 @@ def validate_document(ls, uri):
     ls.text_document_publish_diagnostics(PublishDiagnosticsParams(uri=uri, diagnostics=diagnostics))
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
-def did_open(ls, params: DidOpenTextDocumentParams,
-    PublishDiagnosticsParams):
+def did_open(ls, params: DidOpenTextDocumentParams):
     validate_document(ls, params.text_document.uri)
 
 @server.feature(TEXT_DOCUMENT_DID_CHANGE)
