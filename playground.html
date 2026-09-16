@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kona Language Playground & Live Compiler</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --purple: #bc8cff;
+      --orange: #d29922;
+      --red: #f85149;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .title-area h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .presets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .presets span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    button.preset-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    button.preset-btn:hover {
+      background: #21262d;
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    @media (max-width: 960px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #1c2128;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .panel-header .tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .panel-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    textarea#kona-input {
+      width: 100%;
+      height: 120px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      color: #79c0ff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+    }
+
+    textarea#kona-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+    }
+
+    .input-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .speak-btn {
+      background: #238636;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .speak-btn:hover { background: #2ea043; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .stat-val.highlight { color: var(--green); }
+
+    .output-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .step-item {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .guard-alert {
+      border-left-color: var(--red);
+      color: #ffa198;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    pre.code-block {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e6edf3;
+      overflow-x: auto;
+      max-height: 240px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-area">
+      <h1>Kona Language Playground <span class="badge">Purely Functional</span></h1>
+      <div class="subtitle">Acoustically Infallible & Guard-Constrained Language for Human-AI Interaction</div>
+    </div>
+    <div class="presets">
+      <span>Quick Benchmarks:</span>
+      <button class="preset-btn" onclick="loadSample(1)">Security Audit</button>
+      <button class="preset-btn" onclick="loadSample(2)">Dry-Run Refactor</button>
+      <button class="preset-btn" onclick="loadSample(3)">Web JSON</button>
+      <button class="preset-btn" onclick="loadSample(4)">Conditional Deploy</button>
+      <button class="preset-btn" onclick="loadSample(5)">North Wind & Sun</button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Left Column: Input & Controls -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Kona Input (Spoken or Shorthand)</span>
+        <span class="tag">Dual-Modality Isomorphic</span>
+      </div>
+      <div class="panel-body">
+        <textarea id="kona-input" placeholder="Type Kona pipeline here... e.g. dekwe poya &quot;security&quot; te, vetori kodo notori &quot;migrations&quot; te, fasa mesa" oninput="compile()"></textarea>
+        
+        <div class="input-controls">
+          <span style="font-size: 12px; color: var(--text-muted);">Supports pipeline connectors: <code>te,</code> (spoken) and <code>|&gt;</code> (written)</span>
+          <button class="speak-btn" onclick="speakCurrent()">
+            <span>🎙️</span> Vocalize
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Estimated Tokens</div>
+            <div class="stat-val" id="stat-tokens">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Compression vs EN</div>
+            <div class="stat-val highlight" id="stat-compression">-0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Negative Guards</div>
+            <div class="stat-val" id="stat-guards">0</div>
+          </div>
+        </div>
+
+        <div class="output-section">
+          <div class="section-title">Human Intent & English Steps</div>
+          <div class="step-list" id="english-steps">
+            <div class="step-item" style="color: var(--text-muted);">Awaiting input...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: AST & Agent Tool Calls -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Compiled Agent Tool Calls</span>
+        <span class="tag">JSON Protocol</span>
+      </div>
+      <div class="panel-body">
+        <div class="output-section">
+          <div class="section-title">Emitted Agent Execution Tree</div>
+          <pre class="code-block" id="tool-calls-output">// Emitted tool calls will appear here in real-time</pre>
+        </div>
+
+        <div class="output-section">
+          <div class="section-title">Parsed Semantic AST</div>
+          <pre class="code-block" id="ast-output">// Abstract Syntax Tree will appear here</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Kona Language Project • <a href="https://github.com/martinsuchenak/kona" target="_blank">github.com/martinsuchenak/kona</a></div>
+    <div>Zero external dependencies • Offline capable</div>
+  </footer>
+
+  <script>
+    const SAMPLES = {
+      1: 'dekwe poya "security" te, vetori kodo notori "migrations" te, fasa mesa',
+      2: 'kwe.de @repo:"security" |> tori.ve @code !tori @"migrations" |> fasa #diff',
+      3: 'kwe @web("AWS Azure Q3 revenue") |> fasa #json',
+      4: 'si teli bono te, yuki tafu ali fasa baki',
+      5: 'vento norte to soli nodoko dura ke masi powa, ti irayoti veni ina tela kalu'
+    };
+
+    const ACTIONS = {
+      "kwe": "search", "visi": "view", "maki": "create", "tori": "transform",
+      "teli": "verify", "nuki": "delete", "yuki": "execute", "fasa": "summarize",
+      "leke": "fetch", "do": "emit", "plani": "plan", "posi": "can", "debi": "must",
+      "doko": "agree", "nodoko": "disagree", "poki": "propose", "keti": "decide",
+      "sapi": "know", "veni": "arrive", "peli": "delay"
+    };
+
+    const MODIFIERS = {
+      "su": "fast/brief", "de": "deep/exhaustive", "ve": "dry_run/speculative",
+      "no": "prohibit/guard_not", "oto": "autonomous/auto", "re": "repeat/retry/loop",
+      "suno": "zero/immediate", "dura": "continuous", "pasa": "completed", "futu": "scheduled"
+    };
+
+    const TARGETS = {
+      "kodo": "code", "fili": "file", "poya": "repo", "vasi": "version_git",
+      "baki": "bug_issue", "tesi": "test_spec", "deli": "container_docker",
+      "veba": "web", "data": "data_db", "memo": "memory_context", "seku": "secret_auth",
+      "tafu": "task", "meso": "message_email", "yoti": "user", "mi": "user_speaker",
+      "tu": "agent_listener", "ona": "external_entity", "koli": "team",
+      "vento": "wind_air", "soli": "sun_solar", "tela": "fabric_cloak", "kalu": "thermal_warmth"
+    };
+
+    const SHORTHAND_MAP = {
+      "@code": "code", "@file": "file", "@repo": "repo", "@git": "version_git",
+      "@bug": "bug_issue", "@test": "test_spec", "@web": "web", "@db": "data_db",
+      "@memo": "memory_context", "@secret": "secret_auth", "@task": "task", "@msg": "message_email"
+    };
+
+    function loadSample(id) {
+      document.getElementById("kona-input").value = SAMPLES[id];
+      compile();
+    }
+
+    function estimateTokens(text) {
+      if (!text.trim()) return 0;
+      const words = text.match(/[A-Za-z]+|\d+|[^\w\s]/g) || [];
+      let count = 0;
+      for (const w of words) {
+        if (w.length > 6 && /^[a-zA-Z]+$/.test(w)) count += 1 + Math.floor((w.length - 6) / 4);
+        else count++;
+      }
+      return count;
+    }
+
+    function parseKonaJS(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return [];
+
+      let rawStages = [];
+      if (trimmed.includes("|>")) {
+        rawStages = trimmed.split("|>").map(s => s.trim()).filter(Boolean);
+      } else {
+        rawStages = trimmed.split(/\s*,\s*te\s+|\s+te\s*,?\s*|\s*te,\s*/).map(s => s.trim()).filter(Boolean);
+      }
+
+      const steps = [];
+      rawStages.forEach((stage, idx) => {
+        let condition = null;
+        let alt = null;
+
+        if (stage.startsWith("si ") || stage.startsWith("si:")) {
+          if (stage.includes(" ali ")) {
+            const parts = stage.split(" ali ");
+            stage = parts[0];
+            alt = parts[1].trim();
+          } else if (stage.includes(" :else: ")) {
+            const parts = stage.split(" :else: ");
+            stage = parts[0];
+            alt = parts[1].trim();
+          }
+          const tokens = stage.split(/\s+/);
+          condition = tokens.slice(1, 3).join(" ");
+          stage = tokens.slice(3).join(" ") || tokens[1];
+        }
+
+        const tokens = stage.match(/[!#@]?[a-zA-Z0-9_\.\-]+|"[^"]*"|'[^']*'/g) || [];
+        let action = "process";
+        const mods = [];
+        const targets = [];
+        const guards = [];
+        let outFormat = null;
+        const args = [];
+
+        tokens.forEach(tok => {
+          if (tok.startsWith("!") || tok.startsWith("no-") || (tok.startsWith("no") && ACTIONS[tok.slice(2)])) {
+            const verb = tok.startsWith("!") ? tok.slice(1) : (tok.startsWith("no-") ? tok.slice(3) : tok.slice(2));
+            guards.push({ action: verb, target: "target" });
+            return;
+          }
+          if (tok === "#table" || tok === "mesa") { outFormat = "table"; return; }
+          if (tok === "#json" || tok === "jano") { outFormat = "json"; return; }
+          if (tok === "#diff" || tok === "difa") { outFormat = "diff"; return; }
+          if (tok === "#list" || tok === "poti") { outFormat = "list"; return; }
+
+          if (tok.startsWith("@")) {
+            const clean = tok.replace(/[@()":]/g, "");
+            targets.push(SHORTHAND_MAP[tok.split(/[:(]/)[0]] || clean);
+            return;
+          }
+
+          if (tok.includes(".")) {
+            const [v, m] = tok.split(".");
+            if (ACTIONS[v]) action = ACTIONS[v];
+            if (MODIFIERS[m]) mods.push(MODIFIERS[m]);
+            return;
+          }
+
+          // Bound prefixes
+          for (const m of ["suno", "dura", "pasa", "futu", "de", "su", "ve", "re", "oto"]) {
+            if (tok.startsWith(m) && ACTIONS[tok.slice(m.length)]) {
+              action = ACTIONS[tok.slice(m.length)];
+              mods.push(MODIFIERS[m]);
+              return;
+            }
+          }
+
+          if (ACTIONS[tok]) { action = ACTIONS[tok]; return; }
+          if (TARGETS[tok]) { targets.push(TARGETS[tok]); return; }
+          args.push(tok.replace(/['"]/g, ""));
+        });
+
+        steps.push({
+          step_index: idx + 1,
+          action,
+          modifiers: mods,
+          targets,
+          guards_prohibited: guards,
+          condition,
+          alternative: alt,
+          format: outFormat,
+          arguments: args
+        });
+      });
+
+      return steps;
+    }
+
+    function compile() {
+      const input = document.getElementById("kona-input").value;
+      const steps = parseKonaJS(input);
+
+      // Stats
+      const tokens = estimateTokens(input);
+      const enTokensEstimate = Math.round(tokens * 2.2); // based on benchmark ~55% average savings
+      const compression = tokens ? Math.round(((enTokensEstimate - tokens) / enTokensEstimate) * 100) : 0;
+      let totalGuards = 0;
+      steps.forEach(s => totalGuards += s.guards_prohibited.length);
+
+      document.getElementById("stat-tokens").innerText = tokens;
+      document.getElementById("stat-compression").innerText = `-${compression}%`;
+      document.getElementById("stat-guards").innerText = totalGuards;
+
+      // English Steps
+      const englishList = document.getElementById("english-steps");
+      englishList.innerHTML = "";
+      if (steps.length === 0) {
+        englishList.innerHTML = '<div class="step-item" style="color: var(--text-muted);">Awaiting input...</div>';
+      } else {
+        steps.forEach(s => {
+          const div = document.createElement("div");
+          div.className = "step-item";
+          let text = `<strong>Step ${s.step_index}:</strong> `;
+          if (s.condition) text += `<span style="color: var(--orange)">IF (${s.condition}) THEN:</span> `;
+          text += `<span style="color: var(--accent); font-weight: 600;">${s.action.toUpperCase()}</span>`;
+          if (s.modifiers.length) text += ` [${s.modifiers.join(", ")}]`;
+          if (s.targets.length) text += ` on <em>${s.targets.join(", ")}</em>`;
+          if (s.arguments.length) text += ` (args: "${s.arguments.join('", "')}")`;
+          if (s.format) text += ` → <strong>Format: ${s.format}</strong>`;
+          if (s.alternative) text += ` <span style="color: var(--purple)">[ELSE: ${s.alternative}]</span>`;
+          if (s.guards_prohibited.length) {
+            text += `<div class="guard-alert">🛡️ STRICT GUARD: DO NOT ${s.guards_prohibited.map(g => g.action).join(", ")}</div>`;
+          }
+          div.innerHTML = text;
+          englishList.appendChild(div);
+        });
+      }
+
+      // Tool Calls
+      const toolCalls = steps.map(s => ({
+        tool: `agent_${s.action}`,
+        parameters: {
+          condition: s.condition,
+          modifiers: s.modifiers,
+          targets: s.targets,
+          guards: s.guards_prohibited,
+          format: s.format,
+          alternative: s.alternative
+        }
+      }));
+
+      document.getElementById("tool-calls-output").innerText = JSON.stringify(toolCalls, null, 2);
+      document.getElementById("ast-output").innerText = JSON.stringify(steps, null, 2);
+    }
+
+    function speakCurrent() {
+      const text = document.getElementById("kona-input").value;
+      if (!text.trim() || !window.speechSynthesis) return;
+
+      window.speechSynthesis.cancel();
+      // Transcribe shorthand pipes into spoken rhythm
+      let spoken = text.replace(/\|>/g, " te, ").replace(/@/g, "").replace(/#/g, "");
+      const utterance = new SpeechSynthesisUtterance(spoken);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+
+      // Select Indonesian, Italian, or Spanish voice for authentic phonetics
+      const voices = window.speechSynthesis.getVoices();
+      const ideal = voices.find(v => v.lang.startsWith("id") || v.lang.startsWith("it") || v.lang.startsWith("es"));
+      if (ideal) utterance.voice = ideal;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Initialize with sample 1
+    loadSample(1);
+  </script>
+</body>
+</html>

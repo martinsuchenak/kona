@@ -1,0 +1,257 @@
+(* ===========================================================================
+   Kona Language (コナビ) Formal Grammar Specification
+   Standard: ISO/IEC 14977 Extended Backus-Naur Form (EBNF)
+   =========================================================================== *)
+
+(* --- 1. Top-Level Program / Utterance --- *)
+Utterance
+    = Pipeline ;
+
+Pipeline
+    = ShorthandPipeline
+    | SpokenPipeline ;
+
+ShorthandPipeline
+    = PipelineStage , { ShorthandPipe , PipelineStage } ;
+
+SpokenPipeline
+    = PipelineStage , { SpokenPipe , PipelineStage } ;
+
+ShorthandPipe
+    = "|>" ;
+
+SpokenPipe
+    = "te" | "te," | "te ," ;
+
+
+(* --- 2. Pipeline Stages & Execution Units --- *)
+PipelineStage
+    = [ ConditionalPrefix ] , StageBody , [ AlternativeBranch ] ;
+
+ConditionalPrefix
+    = "si" , Whitespace , Expression , ( SpokenPipe | ":" ) ;
+
+AlternativeBranch
+    = ( "ali" | ":else:" ) , Whitespace , PipelineStage ;
+
+StageBody
+    = { Element , [ Whitespace ] } ;
+
+Element
+    = GuardConstraint
+    | FormatSpecifier
+    | TargetReference
+    | ActionExpression
+    | RelativeClause
+    | LiteralValue
+    | Identifier ;
+
+
+(* --- 3. Action Expressions & Higher-Order Modifiers --- *)
+ActionExpression
+    = ModifiedAction
+    | BaseAction ;
+
+ModifiedAction
+    = PrefixModifier , [ "-" ] , BaseAction
+    | BaseAction , "." , PostfixModifier ;
+
+BaseAction
+    = "kwe"    (* search / query / grep *)
+    | "visi"   (* view / inspect / cat *)
+    | "maki"   (* create / scaffold *)
+    | "tori"   (* transform / edit / refactor *)
+    | "teli"   (* verify / test / benchmark *)
+    | "nuki"   (* delete / prune / purge *)
+    | "yuki"   (* execute / run / deploy *)
+    | "fasa"   (* summarize / explain / report *)
+    | "leke"   (* fetch / pull / download *)
+    | "do"     (* emit / send / notify *)
+    | "plani"  (* plan / schedule *)
+    | "oki"    (* start / initialize *)
+    | "fini"   (* end / terminate *)
+    | "mova"   (* move / transfer *)
+    | "ira"    (* navigate / go *)
+    | "para"   (* pause / halt *)
+    | "posi"   (* can / able *)
+    | "debi"   (* must / obligation *)
+    | "doko"   (* agree / align *)
+    | "nodoko" (* disagree / dispute *)
+    | "poki"   (* propose / suggest *)
+    | "keti"   (* decide / resolve *)
+    | "sapi"   (* understand / know *)
+    | "veni"   (* arrive / approach *)
+    | "peli"   (* defer / delay *)
+    | "tapi"   (* type / input *)
+    | "kiri"   (* write / author *)
+    ;
+
+PrefixModifier
+    = "de"     (* deep / exhaustive *)
+    | "su"     (* fast / brief *)
+    | "ve"     (* speculative / dry-run *)
+    | "no"     (* negative guard / prohibited *)
+    | "oto"    (* autonomous / auto *)
+    | "re"     (* retry / repeat / loop *)
+    | "suno"   (* zero / immediate / force *)
+    | "dura"   (* durative / continuous *)
+    | "pasa"   (* past / audit log *)
+    | "futu"   (* future / forecast *)
+    ;
+
+PostfixModifier
+    = PrefixModifier ;
+
+
+(* --- 4. Guard Constraints & Invariants --- *)
+GuardConstraint
+    = ShorthandGuard
+    | SpokenGuard ;
+
+ShorthandGuard
+    = "!" , BaseAction , [ Whitespace ] , ( TargetReference | LiteralValue ) ;
+
+SpokenGuard
+    = ( "notori" | "no-" , BaseAction | "no" , BaseAction ) , [ Whitespace ] , ( TargetReference | LiteralValue ) ;
+
+
+(* --- 5. Targets & Entities --- *)
+TargetReference
+    = ShorthandTarget
+    | SpokenTarget ;
+
+ShorthandTarget
+    = "@" , TargetIdentifier , [ TargetArgument ] ;
+
+TargetArgument
+    = ":" , ( StringLiteral | Identifier )
+    | "(" , StringLiteral , ")" ;
+
+SpokenTarget
+    = TargetIdentifier , [ Whitespace , StringLiteral ] ;
+
+TargetIdentifier
+    = CompoundTarget
+    | BaseTarget ;
+
+BaseTarget
+    (* Code & Engineering *)
+    = "kodo"     (* code *)
+    | "fili"     (* file *)
+    | "poya"     (* repo *)
+    | "vasi"     (* version / git *)
+    | "baki"     (* bug / issue *)
+    | "tesi"     (* test *)
+    | "deli"     (* container / docker *)
+    | "sisa"     (* system / os *)
+    | "seli"     (* lock / mutex *)
+    (* Network & Data *)
+    | "veba"     (* web *)
+    | "peji"     (* page / url *)
+    | "liki"     (* link *)
+    | "neto"     (* network / api *)
+    | "data"     (* data / db *)
+    | "memo"     (* memory / context *)
+    | "seku"     (* secret / auth *)
+    | "tafu"     (* task *)
+    | "meso"     (* message / email *)
+    (* Temporal & Measurement *)
+    | "toko"     (* time / duration *)
+    | "sekunda"  (* second *)
+    | "minuta"   (* minute *)
+    | "kora"     (* hour *)
+    | "dya"      (* day *)
+    | "wiki"     (* week *)
+    (* Physical & Nature *)
+    | "vento"    (* wind / air *)
+    | "soli"     (* sun / solar *)
+    | "norte"    (* north *)
+    | "tela"     (* cloak / fabric *)
+    | "kalu"     (* thermal / heat *)
+    | "luce"     (* light *)
+    | "powa"     (* power / energy *)
+    (* Persons & Pronouns *)
+    | "mi"       (* user / speaker *)
+    | "tu"       (* agent / listener *)
+    | "ona"      (* external / third-party *)
+    | "koli"     (* team / collective *)
+    | "yoti"     (* person / user *)
+    ;
+
+CompoundTarget
+    = BaseTarget , AffixSuffix ;
+
+AffixSuffix
+    = "koso"     (* physical device: kisikoso, tapikoso *)
+    | "peji"     (* screen / surface: visipeji, mesapeji *)
+    | "kaba"     (* workspace / room: kodokaba, delikaba *)
+    | "yoti"     (* specialist: kodoyoti, makiyoti, irayoti *)
+    | "fini"     (* deadline: tokofini *)
+    | "oki"      (* start: tokooki *)
+    | "pasa"     (* history log: tokopasa *)
+    | "futu"     (* forecast: tokofutu *)
+    ;
+
+
+(* --- 6. Relative Clauses & Connectors --- *)
+RelativeClause
+    = TargetReference , Whitespace , "ke" , Whitespace , ClauseBody ;
+
+ClauseBody
+    = { Element , [ Whitespace ] } ;
+
+
+(* --- 7. Output Formats --- *)
+FormatSpecifier
+    = ShorthandFormat
+    | SpokenFormat ;
+
+ShorthandFormat
+    = "#table"
+    | "#list"
+    | "#json"
+    | "#raw"
+    | "#diff"
+    ;
+
+SpokenFormat
+    = "mesa"     (* table *)
+    | "poti"     (* list *)
+    | "jano"     (* json *)
+    | "puro"     (* raw / plain text *)
+    | "difa"     (* diff *)
+    ;
+
+
+(* --- 8. Lexical Tokens & Literals --- *)
+Expression
+    = { ? any valid token except pipe or delimiter ? } ;
+
+LiteralValue
+    = StringLiteral
+    | NumberLiteral ;
+
+StringLiteral
+    = '"' , { ? any character except quote ? } , '"'
+    | "'" , { ? any character except single quote ? } , "'" ;
+
+NumberLiteral
+    = Digit , { Digit } , [ "." , Digit , { Digit } ] ;
+
+Digit
+    = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+Identifier
+    = Letter , { Letter | Digit | "_" | "-" } ;
+
+Letter
+    = Consonant | Vowel ;
+
+Vowel
+    = "a" | "e" | "i" | "o" | "u" ;
+
+Consonant
+    = "p" | "t" | "k" | "m" | "n" | "s" | "f" | "l" | "w" | "y" | "j" | "r" | "b" | "d" | "v" | "g" ;
+
+Whitespace
+    = { " " | "\t" | "\n" | "\r" } ;

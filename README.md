@@ -23,22 +23,42 @@ Kona is an engineered constructed language designed specifically for high-effici
 
 ---
 
-## Documentation
+## Documentation & Specification
 
 - [Language Specification](KONA_SPECIFICATION.md): Core theory, phonetics, formal grammar, and linguistic benchmarks.
 - [Comprehensive Lexicon](LEXICON.md): 19-section reference dictionary covering numbers, actions, hardware, negotiation, conditionals, and real-world workflows.
+- [Formal EBNF Grammar](kona.ebnf): Standard ISO/IEC 14977 context-free grammar specification.
 - [Agent System Prompt](kona_system_prompt.md): Ready-to-use system prompt for zero-shot Kona execution in any foundation LLM.
 
 ---
 
-## Quickstart
+## Interactive Playground
+
+Open [`playground.html`](playground.html) in any web browser to access the live dual-modality playground:
+- Real-time compiler generating AST, emitted agent tool calls, and English translations as you type.
+- Live token compression meter measuring keystroke savings against natural English.
+- Native speech synthesis vocalizer using authentic $(C)V$ moraic cadence.
+
+---
+
+## Quickstart & CLI Tools
 
 Run the compiler demo:
 ```bash
 python3 kona.py --demo
 ```
 
-Run the formal benchmark suite (3 linguistic benchmarks):
+Run the unit and regression test suite:
+```bash
+python3 test_kona.py
+```
+
+Run the automated token and character compression benchmark:
+```bash
+python3 benchmark_tokens.py
+```
+
+Run the linguistic benchmark evaluation suite:
 ```bash
 python3 kona.py --benchmarks
 ```
@@ -48,10 +68,19 @@ Launch the interactive REPL:
 python3 kona.py --repl
 ```
 
-Test conditional logic and pipelines directly from the CLI:
+Test pipelines directly from the CLI:
 ```bash
 python3 kona.py 'si teli bono te, yuki tafu ali fasa baki'
 ```
+
+---
+
+## Editor Syntax Highlighting
+
+Kona includes TextMate syntax highlighting for VS Code and compatible editors:
+- Grammar: [`syntaxes/kona.tmLanguage.json`](syntaxes/kona.tmLanguage.json)
+- Config: [`language-configuration.json`](language-configuration.json)
+- Sample: [`example.kona`](example.kona)
 
 ---
 

@@ -1,0 +1,17 @@
+// Kona (コナビ) Language Examples
+// Purely functional, acoustically engineered syntax for AI agents
+
+// 1. Deep code analysis and tabular output
+kwe.de @repo:"security" |> tori.ve @code !tori @"migrations" |> fasa #table
+
+// 2. Web query and structured JSON extraction
+kwe @web("AWS Azure Q3 revenue") |> fasa #json
+
+// 3. Conditional deployment with fallback
+si teli bono |> yuki @task :else: fasa @bug
+
+// 4. Multi-target device inspection
+visi @cam @display |> teli |> do @msg
+
+// 5. Spoken equivalent syntax
+dekwe poya "security" te, vetori kodo notori "migrations" te, fasa mesa

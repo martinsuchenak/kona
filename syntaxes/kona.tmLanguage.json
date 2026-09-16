@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Kona",
+  "scopeName": "source.kona",
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.kona",
+      "match": "//.*$"
+    },
+    {
+      "name": "comment.line.number-sign.kona",
+      "match": "#\\s.*$"
+    },
+    {
+      "name": "keyword.operator.pipeline.kona",
+      "match": "\\|>"
+    },
+    {
+      "name": "keyword.operator.connector.kona",
+      "match": "\\bte,?\\b"
+    },
+    {
+      "name": "keyword.control.conditional.kona",
+      "match": "\\b(si|ali|:else:)\\b"
+    },
+    {
+      "name": "keyword.control.relative.kona",
+      "match": "\\b(ke|kasi|pero|to|o|kono)\\b"
+    },
+    {
+      "name": "keyword.control.guard.kona",
+      "match": "(![a-zA-Z\\-]+|\\bnotori\\b|\\bno-[a-zA-Z\\-]+)"
+    },
+    {
+      "name": "storage.type.format.kona",
+      "match": "(#(table|json|diff|list|raw)|\\b(mesa|jano|difa|poti|puro)\\b)"
+    },
+    {
+      "name": "variable.other.target.shorthand.kona",
+      "match": "@[a-zA-Z0-9_\\-\\.:\\(\\)\"]+"
+    },
+    {
+      "name": "storage.modifier.kona",
+      "match": "\\b(de|su|ve|oto|re|suno|dura|pasa|futu)-|\\.(de|su|ve|oto|re|suno|dura|pasa|futu)\\b"
+    },
+    {
+      "name": "entity.name.function.action.kona",
+      "match": "\\b(kwe|visi|maki|tori|teli|nuki|yuki|fasa|leke|do|plani|oki|fini|mova|ira|para|posi|debi|doko|nodoko|poki|keti|sapi|veni|peli|tapi|kiri)\\b"
+    },
+    {
+      "name": "entity.name.type.target.kona",
+      "match": "\\b(kodo|fili|poya|vasi|baki|tesi|deli|sisa|seli|veba|peji|liki|neto|data|memo|seku|tafu|meso|yoti|mi|tu|ona|koli|vento|soli|norte|tela|kalu|luce|powa|toko|sekunda|minuta|kora|dya|wiki|irayoti|kisikoso|sonokoso|visikoso|visipeji|tapikoso|powakoso|tokokoso|kodokaba|delikaba|datakaba|kodoyoti|makiyoti|teliyoti|tokofini|tokooki|tokopasa|tokofutu)\\b"
+    },
+    {
+      "name": "string.quoted.double.kona",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.kona",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "string.quoted.single.kona",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.kona",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "constant.numeric.kona",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    }
+  ]
+}
