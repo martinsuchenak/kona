@@ -27,6 +27,7 @@ Kona is an engineered constructed language designed specifically for high-effici
 
 - [Language Specification](KONA_SPECIFICATION.md): Core theory, phonetics, formal grammar, and linguistic benchmarks.
 - [Comprehensive Lexicon](LEXICON.md): 19-section reference dictionary covering numbers, actions, hardware, negotiation, conditionals, and real-world workflows.
+- [Agent System Prompt](kona_system_prompt.md): Ready-to-use system prompt for zero-shot Kona execution in any foundation LLM.
 
 ---
 
@@ -37,12 +38,17 @@ Run the compiler demo:
 python3 kona.py --demo
 ```
 
+Run the formal benchmark suite (3 linguistic benchmarks):
+```bash
+python3 kona.py --benchmarks
+```
+
 Launch the interactive REPL:
 ```bash
 python3 kona.py --repl
 ```
 
-Test conditional logic and pipelines:
+Test conditional logic and pipelines directly from the CLI:
 ```bash
 python3 kona.py 'si teli bono te, yuki tafu ali fasa baki'
 ```
@@ -51,7 +57,8 @@ python3 kona.py 'si teli bono te, yuki tafu ali fasa baki'
 
 ## Proven Benchmarks
 
-Kona has been verified against three formal linguistic stress-tests:
+Kona has been verified against three formal linguistic stress-tests (`python3 kona.py --benchmarks`):
 1. **Collaborative Problem-Solving & Debugging Dialogue**: Technical dispute, relative clauses (`ke`), durative aspect (`dura`), and contrastive preferences.
 2. **Technical System Specification**: Authentication token expiry, caching constraints, and sequential procedure execution.
 3. **The North Wind and the Sun (Universal Narrative Benchmark)**: Narrative storytelling, causative constructions (`maki`), and correlative comparatives (`masi A te, masi B`).
+

@@ -35,6 +35,15 @@ ACTIONS = {
     "para":  {"name": "pause",     "desc": "Stop/Halt/Pause"},
     "posi":  {"name": "can",       "desc": "Can/Could/Able"},
     "debi":  {"name": "must",      "desc": "Must/Should/Ought"},
+    # Social, alignment & negotiation
+    "doko":  {"name": "agree",     "desc": "Agree/Align/Consent"},
+    "poki":  {"name": "propose",   "desc": "Propose/Suggest/Offer"},
+    "keti":  {"name": "decide",    "desc": "Decide/Resolve/Determine"},
+    "sapi":  {"name": "know",      "desc": "Know/Understand/Comprehend"},
+    "veni":  {"name": "arrive",    "desc": "Arrive/Come/Approach"},
+    "peli":  {"name": "delay",     "desc": "Delay/Postpone/Defer"},
+    "tapi":  {"name": "type",      "desc": "Type/Keystroke/Input"},
+    "kiri":  {"name": "write",     "desc": "Write/Author/Draft"},
 }
 
 TARGETS = {
@@ -54,6 +63,14 @@ TARGETS = {
     "norte": "north_direction",
     "tela":  "fabric_cloak",
     "kalu":  "thermal_warmth",
+    "luce":  "light_illumination",
+    "powa":  "power_energy",
+    "toko":  "time_interval",
+    "sekunda": "second_unit",
+    "minuta":  "minute_unit",
+    "kora":    "hour_unit",
+    "dya":     "day_unit",
+    "wiki":    "week_unit",
     "irayoti": "traveler",
     # Hardware & Physical Devices (-koso compounding)
     "kisikoso": "microphone",
@@ -98,12 +115,16 @@ TARGETS = {
 }
 
 MODIFIERS = {
-    "su":  "fast/brief",
-    "de":  "deep/exhaustive",
-    "ve":  "dry_run/speculative",
-    "no":  "prohibit/guard_not",
-    "oto": "autonomous/auto",
-    "re":  "repeat/retry/loop",
+    "su":   "fast/brief",
+    "de":   "deep/exhaustive",
+    "ve":   "dry_run/speculative",
+    "no":   "prohibit/guard_not",
+    "oto":  "autonomous/auto",
+    "re":   "repeat/retry/loop",
+    "suno": "zero/without_delay",
+    "dura": "continuous/in_progress",
+    "pasa": "past/completed",
+    "futu": "future/scheduled",
 }
 
 FORMATS = {
@@ -421,10 +442,10 @@ def extract_verb_and_modifiers(tok: str):
                 mods.append(MODIFIERS[p])
         return verb, mods
 
-    # 3. Check bound morpheme prefix: dekwe, vetori, sufasa
-    for m, mod_desc in MODIFIERS.items():
+    # 3. Check bound morpheme prefix: dekwe, vetori, sufasa, sunodata
+    for m in sorted(MODIFIERS.keys(), key=len, reverse=True):
         if tok.startswith(m) and tok[len(m):] in ACTIONS:
-            return tok[len(m):], [mod_desc]
+            return tok[len(m):], [MODIFIERS[m]]
 
     return tok, []
 
@@ -498,6 +519,71 @@ def demo():
         print("Compiled Agent Tool Calls:")
         print(json.dumps(ast.to_tool_calls(), indent=2))
 
+def run_benchmarks():
+    print("=" * 75)
+    print("Kona Linguistic & Agentic Benchmarks Suite")
+    print("=" * 75)
+
+    benchmarks = [
+        {
+            "id": "Benchmark 1",
+            "title": "Collaborative Debugging & Problem-Solving Dialogue",
+            "lines": [
+                ("User", 'mi visi tokopasa ke tu do, pero baki nosapi kasi data yuki dura'),
+                ("User", 'tu posi teli si neto nuki pasa reoki'),
+                ("User", 'si ye, koli debi peli masi tokofini, no retori kwe'),
+                ("Agent", 'mi teli sunodata neto te, neto no nuki pero data yuki masi deko sekunda kasi seli'),
+                ("Agent", 'mi poki ke koli nuki seli pasa te, reteli toko kwe')
+            ]
+        },
+        {
+            "id": "Benchmark 2",
+            "title": "Technical System Procedure: Token Expiry & Cache Invalidation",
+            "lines": [
+                ("Spec", 'ti yoti kwe seku te, teli seku ina memo'),
+                ("Spec", 'si seku fini te, leke suno futu uta neto seku'),
+                ("Spec", 'tori seku te, do memo pasa duo toko')
+            ]
+        },
+        {
+            "id": "Benchmark 3",
+            "title": "Universal Narrative Benchmark: The North Wind and the Sun",
+            "lines": [
+                ("Story", 'vento norte to soli nodoko dura ke masi powa, ti irayoti veni ina tela kalu'),
+                ("Story", 'ona doko ke yoti ke pasa maki irayoti nuki tela debi sapi masi powa supra ali'),
+                ("Story", 'futu vento norte do powa sama muto posi, pero masi vento yuki te masi irayoti koli tela'),
+                ("Story", 'futu soli do luce to kalu te ina suno toko irayoti nuki tela'),
+                ("Story", 'kono vento norte debi fasa ye ke soli masi powa supra duo')
+            ]
+        }
+    ]
+
+    for bm in benchmarks:
+        print(f"\n{'#' * 75}")
+        print(f"[{bm['id']}] {bm['title']}")
+        print(f"{'#' * 75}")
+        for speaker, utterance in bm["lines"]:
+            print(f"\n[{speaker}] {utterance}")
+            ast = parse_kona(utterance)
+            print("  Parsed Pipeline AST:")
+            for line in ast.to_english():
+                print(f"    • {line}")
+            tool_calls = ast.to_tool_calls()
+            if tool_calls:
+                print(f"  Emitted Agent Tool Operations ({len(tool_calls)}):")
+                for tc in tool_calls:
+                    params_summary = []
+                    if tc["parameters"]["modifiers"]:
+                        params_summary.append(f"mods={tc['parameters']['modifiers']}")
+                    if tc["parameters"]["targets"]:
+                        params_summary.append(f"targets={[t['type'] for t in tc['parameters']['targets']]}")
+                    if tc["parameters"]["prohibited_invariants"]:
+                        params_summary.append(f"guards={tc['parameters']['prohibited_invariants']}")
+                    if tc["parameters"]["condition"]:
+                        params_summary.append(f"if={tc['parameters']['condition']}")
+                    summary_str = f" ({', '.join(params_summary)})" if params_summary else ""
+                    print(f"    -> {tc['tool']}{summary_str}")
+
 def repl():
     print("=" * 60)
     print("Kona Interactive REPL (type 'exit' to quit, 'say <cmd>' to vocalize)")
@@ -527,6 +613,8 @@ if __name__ == "__main__":
         arg = " ".join(sys.argv[1:])
         if arg == "--demo":
             demo()
+        elif arg == "--benchmarks":
+            run_benchmarks()
         elif arg == "--repl":
             repl()
         elif arg.startswith("--say "):

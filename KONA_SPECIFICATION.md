@@ -144,11 +144,13 @@ kono vento norte debi fasa ye ke soli masi powa supra duo.
 
 ---
 
-## 7. Next Engineering Milestones
+## 7. Implementation Status & Roadmap
 
-1. **Audio Synthesis Verification**:
-   - Validate pronunciation and cadence using the native macOS speech synthesis engine (`say`) across various target rates.
-2. **Deterministic EBNF Grammar**:
-   - Write a formal context-free grammar to ensure zero-backtracking parsing.
-3. **Kona Compiler & Transpiler (Python)**:
-   - Build a parser that converts spoken transcripts or shorthand directly into executable agent actions (e.g. tool calls and prompt context).
+| Milestone | Status | Details |
+| :--- | :--- | :--- |
+| **1. Phonetic Synthesis & Verification** |  **Completed** | Validated native macOS speech engine (`Damayanti`, Indonesian/Austronesian Latin phonotactics) with 5 cardinal vowels and moraic `te` pacing. |
+| **2. Python Compiler & Transpiler** |  **Completed** | Implemented `kona.py` with dual-modality parser (spoken `te` & written `\|>`), AST generation, guard constraints, English translation, and tool-call emission. |
+| **3. Multi-Benchmark Evaluation Suite** |  **Completed** | Verified across 3 formal benchmarks: Collaborative Debugging, Technical System Spec, and North Wind & Sun fable (`python3 kona.py --benchmarks`). |
+| **4. Portable LLM Agent System Prompt** | 🟡 **Active** | Standardized prompt (`kona_system_prompt.md`) enabling any foundation model (Gemini, Claude, GPT) to parse and speak Kona natively. |
+| **5. Deterministic Formal EBNF Grammar** | 🟡 **Active** | Formal grammar for AST linters and zero-backtracking tokenizers. |
+| **6. Interactive Playground & Metrics** | ⚪ **Planned** | Web/terminal dashboard measuring side-by-side token compression, parse latency, and semantic accuracy. |
