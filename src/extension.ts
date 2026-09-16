@@ -1,5 +1,6 @@
 import * as path from 'path';
-import { ExtensionContext } from 'vscode';
+import * as fs from 'fs';
+import { ExtensionContext, workspace } from 'vscode';
 import {
     LanguageClient,
     LanguageClientOptions,
@@ -9,9 +10,17 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
-    // We assume lsp-env/bin/python is available in the workspace root
-    // For a production extension, you would package this or use the system python.
-    const pythonPath = context.asAbsolutePath(path.join('lsp-env', 'bin', 'python3'));
+    let pythonPath = 'python3'; // Fallback to system python
+    
+    // Attempt to use the local workspace lsp-env if it exists
+    if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
+        const wsPath = workspace.workspaceFolders[0].uri.fsPath;
+        const localEnv = path.join(wsPath, 'lsp-env', 'bin', 'python3');
+        if (fs.existsSync(localEnv)) {
+            pythonPath = localEnv;
+        }
+    }
+
     const serverScript = context.asAbsolutePath('kona_lsp.py');
 
     const serverOptions: ServerOptions = {
