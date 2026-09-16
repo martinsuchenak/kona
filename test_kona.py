@@ -82,5 +82,33 @@ class TestKonaParser(unittest.TestCase):
         self.assertEqual(pipeline.stages[0].body.targets[0]["type"], "nominalization")
         self.assertEqual(pipeline.stages[0].body.targets[0]["args"], "kwe")
 
+
+    def test_turing_expansions(self):
+        # Test Number Parsing (120), Booleans (lo), Scoping (ina)
+        code = "kwe nipaduze lo rogi ina seli te, kada te, fasa mesa"
+        pipeline = parse_kona(code)
+        
+        # Stages: kwe, kada, fasa
+        self.assertEqual(len(pipeline.stages), 3)
+        
+        # Test kwe targets
+        t_targets = pipeline.stages[0].body.targets
+        # Expected: integer(120), operator(OR), scope(ina seli) (wait, rogi is parsed before ina. ina modifies seli. so targets has rogi, then scope ina seli)
+        
+        self.assertEqual(t_targets[0]["type"], "integer")
+        self.assertEqual(t_targets[0]["args"], 120)
+        
+        self.assertEqual(t_targets[1]["type"], "operator")
+        self.assertEqual(t_targets[1]["value"], "OR")
+        
+        self.assertEqual(t_targets[2]["type"], "rogi")
+        
+        self.assertEqual(t_targets[3]["type"], "scope")
+        self.assertEqual(t_targets[3]["relation"], "ina")
+        self.assertEqual(t_targets[3]["args"], "seli")
+        
+        # Test kada iteration
+        self.assertEqual(pipeline.stages[1].body.action, "kada")
+
 if __name__ == "__main__":
     unittest.main()

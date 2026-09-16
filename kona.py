@@ -48,6 +48,7 @@ ACTIONS = {
     "nolo":  {"name": "reject",    "desc": "Reject/Block/Revert"},
     "koma":  {"name": "compare",   "desc": "Compare/Diff"},
     "fiso":  {"name": "fix",       "desc": "Fix/Patch/Resolve"},
+    "kada":  {"name": "iterate",   "desc": "Map/For-Each"},
     "kiri":  {"name": "write",     "desc": "Write/Author/Draft"},
 }
 
@@ -156,6 +157,10 @@ TARGETS = {
     "koli": "team_collective",
 }
 
+DIGITS = {
+    "ze": "0", "pa": "1", "du": "2", "ti": "3", "fo": "4",
+    "mu": "5", "sa": "6", "ke": "7", "bi": "8", "go": "9"
+}
 MODIFIERS = {
     "su":   "fast/brief",
     "de":   "deep/exhaustive",
@@ -498,6 +503,35 @@ class Parser:
                         val = val[:-2]
                         break
                             
+                if val == "lo":
+                    targets.append({"type": "operator", "value": "OR"})
+                    continue
+                
+                if val in ("ina", "uta"):
+                    nxt = self.lexer.peek()
+                    if nxt and nxt.type in ("WORD", "STRING"):
+                        scope_target = self.lexer.consume().value
+                        # Resolve base target if it is a shorthand target
+                        if scope_target.startswith("@"):
+                            scope_target = scope_target[1:]
+                            if ":" in scope_target:
+                                scope_target = scope_target.split(":")[0]
+                        targets.append({"type": "scope", "relation": val, "args": scope_target})
+                    continue
+
+                if val.startswith("ni") and len(val) >= 4 and len(val) % 2 == 0:
+                    num_str = ""
+                    valid_num = True
+                    syls = [val[i:i+2] for i in range(2, len(val), 2)]
+                    for s in syls:
+                        if s in DIGITS:
+                            num_str += DIGITS[s]
+                        else:
+                            valid_num = False
+                    if valid_num:
+                        targets.append({"type": "integer", "args": int(num_str)})
+                        continue
+
                 if val in ACTIONS:
                     action = val
                 else:

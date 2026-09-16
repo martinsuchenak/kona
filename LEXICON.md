@@ -272,6 +272,30 @@ Unlike tense (past/future), Aspect defines the *state of completion* of an actio
 | **`-ta`** | /ta/ | Perfective (Completed, finished) | "has searched" (`kweta`) |
 | **`-sa`** | /sa/ | Habitual (Continuous, always does) | "routinely searches" (`kwesa`) |
 
+
+## 15. Booleans & Particles
+| Kona | IPA | Meaning (Target) |
+| :--- | :--- | :--- |
+| **`lo`** | /lo/ | Logical OR |
+| **`ina`** | /i.na/ | Spatial: Inside / Child-of |
+| **`uta`** | /u.ta/ | Spatial: Outside / Excluding |
+
+## 16. Numerals (Base-10 Integers)
+Integers are constructed by prefixing `ni-` to a string of digit syllables. For example, `nipaduze` = 120.
+
+| Syllable | Digit |
+| :--- | :--- |
+| `ze` | 0 |
+| `pa` | 1 |
+| `du` | 2 |
+| `ti` | 3 |
+| `fo` | 4 |
+| `mu` | 5 |
+| `sa` | 6 |
+| `ke` | 7 |
+| `bi` | 8 |
+| `go` | 9 |
+
 ## 14. General Action Primitives (Verbs & Modals)
 
 | Kona Root | IPA | Meaning | Written Shorthand |

@@ -65,6 +65,13 @@ Actions can take aspectual suffixes to denote their state of completion:
 - `-ta` (Perfective): Action has finished (e.g., `yukita` = finished executing).
 - `-sa` (Habitual): Action happens routinely (e.g., `yukisa` = routinely executes).
 
+
+### Turing-Complete Capabilities
+- **Numerals**: Any word starting with `ni` followed by digit syllables (`ze`=0, `pa`=1, `du`=2, `ti`=3, `fo`=4, `mu`=5, `sa`=6, `ke`=7, `bi`=8, `go`=9) evaluates as an integer target. (e.g., `nipaduze` = 120).
+- **Booleans**: The particle `lo` functions as a logical OR between targets (e.g. `kodo lo rogi`). Target stacking defaults to AND.
+- **Iteration**: The action `kada` operates as a functional Map/For-Each loop over the previous pipeline output (`@pato`).
+- **Scoping**: The prepositions `ina` (inside) and `uta` (outside) bound the following target contextually.
+
 ### Modalities
 - Spoken Connector: `te,` (evaluates left-to-right actions).
 - Written Connector: `|>` (forward pipe).
