@@ -14,3 +14,21 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Extension build & deps
+node_modules/
+out/
+*.vsix
+package-lock.json
+
+# Envs
+lsp-env/
+whisper-env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Benchmark artifacts
+*.wav
+*.aiff
