@@ -40,10 +40,10 @@ Instead of memorizing arbitrary opposite words (like *good* vs *bad*, *easy* vs 
 | Base Concept | Opposite (`no-`) | English Meaning |
 | :--- | :--- | :--- |
 | `bono` (good) | **`nobono`** | Bad, poor, flawed |
-| `fasi` (easy / simple) | **`nofasi`** | Hard, difficult, complex |
+| `simi` (easy / simple) | **`nosimi`** | Hard, difficult, complex |
 | `pura` (safe / secure) | **`nopura`** | Risky, dangerous, vulnerable |
 | `kore` (correct / right) | **`nokore`** | Wrong, incorrect, error |
-| `doko` (agree / align) | **`nodoko`** | Disagree, dispute, object |
+| `wapo` (agree / align) | **`nowapo`** | Disagree, dispute, object |
 | `sapi` (understand) | **`nosapi`** | Misunderstand, confuse |
 | `fide` (trust / confident)| **`nofide`** | Distrust, doubt, skeptical |
 | `gala` (satisfied / happy)| **`nogala`** | Frustrated, dissatisfied, unhappy |
@@ -73,7 +73,7 @@ $$\mathbf{Domain / Mode} + \mathbf{peji} \ (\text{surface}) \implies \mathbf{Vis
 $$\mathbf{Object / Entity} + \mathbf{kaba} \ (\text{room/space}) \implies \mathbf{Execution Environment}$$
 
 * `kodo` (code) + `kaba` = **`kodokaba`** $\to$ IDE / Workspace directory
-* `deli` (container) + `kaba` = **`delikaba`** $\to$ Sandbox / Containerized runtime
+* `pako` (container) + `kaba` = **`pakokaba`** $\to$ Sandbox / Containerized runtime
 * `data` (database) + `kaba` = **`datakaba`** $\to$ Database warehouse / Cluster
 * `kaba` standalone = Physical room / Office
 
@@ -94,8 +94,8 @@ Essential for discussing plans, trade-offs, and alignment with humans and AI age
 
 | Kona Root | IPA | Meaning | English Analog |
 | :--- | :--- | :--- | :--- |
-| **`doko`** | /'do.ko/ | Agree, consensus, align, consent | Agree, align |
-| **`nodoko`** | /'no.do.ko/ | Disagree, objection, dispute | Disagree, differ |
+| **`wapo`** | /'do.ko/ | Agree, consensus, align, consent | Agree, align |
+| **`nowapo`** | /'no.do.ko/ | Disagree, objection, dispute | Disagree, differ |
 | **`poki`** | /'po.ki/ | Propose, suggest, offer | Suggest, offer |
 | **`keti`** | /'ke.ti/ | Decide, resolve, determine, settle | Decide, settle |
 | **`kambi`** | /'kam.bi/ | Compromise, trade-off, exchange | Compromise, trade |
@@ -148,8 +148,8 @@ Hardware, sensors, compute environments, and physical surroundings commonly disc
 | :--- | :--- | :--- | :--- |
 | **`kaba`** | /'ka.ba/ | Room, chamber, enclosure, office | Room, office |
 | **`mesa`** | /'me.sa/ | Desk, table, flat work surface | Desk, table |
-| **`luce`** | /'lu.ce/ | Light, lamp, illumination | Light, lamp |
-| **`deli`** | /'de.li/ | Box, container, enclosure | Box, container |
+| **`luke`** | /'lu.ce/ | Light, lamp, illumination | Light, lamp |
+| **`pako`** | /'de.li/ | Box, container, enclosure | Box, container |
 
 ## 6. Spatial Navigation & Movement Compounding
 
@@ -158,7 +158,7 @@ Useful for interface navigation, scrolling, data movement, and spatial commands:
 ### 6.1. Spatial Primitives
 | Kona Root | IPA | Meaning | English Analog |
 | :--- | :--- | :--- | :--- |
-| **`supra`** | /'su.pra/ | Up, above, top, high | Up, top |
+| **`supera`** | /'su.pra/ | Up, above, top, high | Up, top |
 | **`suba`** | /'su.ba/ | Down, below, bottom, low | Down, bottom |
 | **`ante`** | /'an.te/ | Front, forward, ahead | Forward, front |
 | **`posa`** | /'po.sa/ | Back, backward, behind | Back, rear |
@@ -193,13 +193,13 @@ Compounding with **`toko`** (time/duration):
 
 ## 8. Sensory Levels (Audio & Brightness Compounding)
 
-Using **`sono`** (sound/volume) and **`luce`** (light):
+Using **`sono`** (sound/volume) and **`luke`** (light):
 
 * `nosono` (`no-` + `sono`) $\to$ Mute / Silent / No audio
 * `subasono` (`suba` + `sono`) $\to$ Quiet / Low volume
-* `suprasono` (`supra` + `sono`) $\to$ Loud / High volume
-* `subaluce` (`suba` + `luce`) $\to$ Dim light / Dark mode
-* `supraluce` (`supra` + `luce`) $\to$ Bright light / High contrast
+* `suprasono` (`supera` + `sono`) $\to$ Loud / High volume
+* `subaluce` (`suba` + `luke`) $\to$ Dim light / Dark mode
+* `supraluce` (`supera` + `luke`) $\to$ Bright light / High contrast
 
 ---
 
@@ -226,7 +226,7 @@ Using **`sono`** (sound/volume) and **`luce`** (light):
 | **`ti`** | /ti/ | When? At what time? | When? |
 | **`pero`** | /'pe.ro/ | But, however, yet | But, however |
 | **`kasi`** | /'ka.si/ | Because, since, as | Because, since |
-| **`to`** | /to/ | And, with, together with | And, with |
+| **`mapo`** | /'ma.po/ | And, with, together with | And, with |
 | **`o`** | /o/ | Or, either | Or |
 | **`sama`** | /'sa.ma/ | Like, similar to, as, equal | Like, same as |
 | **`ali`** | /'a.li/ | Other, different, else | Other, else |
@@ -281,11 +281,11 @@ Unlike tense (past/future), Aspect defines the *state of completion* of an actio
 | **`uta`** | /u.ta/ | Spatial: Outside / Excluding |
 
 ## 16. Numerals (Base-10 Integers)
-Integers are constructed by prefixing `ni-` to a string of digit syllables. For example, `nipaduze` = 120.
+Integers are constructed by prefixing `ni-` to a string of digit syllables. For example, `nipaduwo` = 120.
 
 | Syllable | Digit |
 | :--- | :--- |
-| `ze` | 0 |
+| `wo` | 0 |
 | `pa` | 1 |
 | `du` | 2 |
 | `ti` | 3 |
@@ -306,8 +306,8 @@ Integers are constructed by prefixing `ni-` to a string of digit syllables. For 
 | **`teli`** | /'te.li/ | Test, verify, benchmark, check | `teli` / `test` |
 | **`nuki`** | /'nu.ki/ | Delete, remove, purge, prune | `nuki` / `rm` |
 | **`fasa`** | /'fa.sa/ | Summarize, explain, speak, render | `fasa` / `sum` |
-| **`yuki`** | /'ju.ki/ | Execute, run, trigger, deploy | `yuki` / `run` |
-| **`plani`** | /'pla.ni/ | Plan, schedule, organize | `plani` / `plan` |
+| **`yuki`** | /'ju.ki/ | Execute, run, trigger, deploy | `yuki` / run |
+| **`pilani`** | /'pla.ni/ | Plan, schedule, organize | `pilani` / `plan` |
 | **`visi`** | /'vi.si/ | View, read, inspect, display | `visi` / `cat` |
 | **`leke`** | /'le.ke/ | Fetch, pull, download, receive | `leke` / `get` |
 | **`do`** | /do/ | Give, send, emit, push, notify | `do` / `send` |
@@ -327,15 +327,15 @@ Integers are constructed by prefixing `ni-` to a string of digit syllables. For 
 | **`vasi`** | /'va.si/ | Version, Git commit, branch, diff | `@git` / `@vcs` |
 | **`baki`** | /'ba.ki/ | Bug, defect, issue, error | `@bug` / `@issue` |
 | **`tesi`** | /'te.si/ | Test suite, unit test, spec | `@test` |
-| **`deli`** | /'de.li/ | Container, Docker, sandbox | `@docker` / `@sandbox` |
+| **`pako`** | /'de.li/ | Container, Docker, sandbox | `@docker` / `@sandbox` |
 | **`seli`** | /'se.li/ | Mutex, resource lock, latch | `@lock` |
 
 ### 12.2. Natural Elements & Physical World
 | Kona Root | IPA | Meaning | English Analog |
 | :--- | :--- | :--- | :--- |
-| **`vento`** | /'ven.to/ | Wind, airflow, breeze | Wind |
+| **`venito`** | /'ven.to/ | Wind, airflow, breeze | Wind |
 | **`soli`** | /'so.li/ | Sun, sunlight, solar | Sun |
-| **`norte`** | /'nor.te/ | North (cardinal direction) | North |
+| **`noreti`** | /'nor.te/ | North (cardinal direction) | North |
 | **`tela`** | /'te.la/ | Fabric, cloth, garment, cloak | Cloth, cloak |
 | **`kalu`** | /'ka.lu/ | Heat, thermal warmth (`nokalu` = cold) | Warmth, cold |
 | **`irayoti`** | /'i.ra.jo.ti/ | Traveler, passerby (`ira` + `yoti`) | Traveler |
@@ -522,7 +522,7 @@ Natural interaction between human operators and agents:
 ### Workflow 4: Autonomous Task Execution
 * **English**: *"Start the task in Docker, test it until complete, and notify me with an email message."*
 * **Kona Spoken**:
-  > `oki tafu ina deli te, ototeli poya te, do meso mi.`
+  > `oki tafu ina pako te, ototeli poya te, do meso mi.`
 * **Kona Shorthand**:
   > `oki @task @docker |> teli.oto @repo |> do @msg @user`
 
@@ -534,7 +534,7 @@ User:  mi visi tokopasa ke tu do, pero baki nosapi kasi data yuki dura.
 User:  tu posi teli si neto nuki pasa reoki?
 User:  si ye, koli debi peli masi tokofini, no retori kwe.
 
-Agent: mi teli sunodata neto. neto no nuki, pero data yuki masi deko sekunda kasi seli.
+Agent: mi teli sunodata neto. neto no nuki, pero data yuki masi deko sekuni kasi seli.
 Agent: mi poki ke koli nuki seli pasa te, reteli toko kwe.
 ```
 
@@ -551,10 +551,57 @@ tori seku te, do memo pasa duo toko.
 
 ### Benchmark 3: Universal Narrative Benchmark (The North Wind and the Sun)
 ```
-vento norte to soli nodoko dura ke masi powa, ti irayoti veni ina tela kalu.
-ona doko ke: yoti ke pasa maki irayoti nuki tela, debi sapi masi powa supra ali.
-futu vento norte do powa sama muto posi, pero masi vento yuki te, masi irayoti koli tela; fini te, vento norte para tafu.
-futu soli do luce to kalu, te ina suno toko irayoti nuki tela.
-kono vento norte debi fasa ye ke soli masi powa supra duo.
+venito noreti to soli nowapo dura ke masi powa, ti irayoti veni ina tela kalu.
+ona wapo ke: yoti ke pasa maki irayoti nuki tela, debi sapi masi powa supera ali.
+futu venito noreti do powa sama muto posi, pero masi venito yuki te, masi irayoti koli tela; fini te, venito noreti para tafu.
+futu soli do luke to kalu, te ina suno toko irayoti nuki tela.
+kono venito noreti debi fasa ye ke soli masi powa supera duo.
 ```
 
+---
+
+## Appendix A — Proposed Vocabulary (not yet implemented)
+
+The words below appear in this document but are **not in the compiler's
+lexicon**. `kona.py` will reject them as unknown words. They are recorded here
+as design intent, not as current language.
+
+This list is machine-checked: `TestLexicon.test_documented_words_exist_in_the_compiler`
+exempts exactly these entries and fails on any *other* word documented here that
+the compiler does not know. To promote one, add it to the appropriate dictionary
+in `kona.py`, confirm `python3 kona.py --validate` still passes (it enforces the
+acoustic-distance invariant, and will reject a word that is confusable with an
+existing one), then delete it from this list.
+
+<!-- PROPOSED-BEGIN -->
+- `akwe`
+- `binadata`
+- `dira`
+- `kalo`
+- `kato`
+- `kilo`
+- `ko`
+- `kura`
+- `kwa`
+- `kwi`
+- `leva`
+- `luma`
+- `medo`
+- `mega`
+- `meka`
+- `meni`
+- `movasuba`
+- `nido`
+- `noakwe`
+- `novo`
+- `numa`
+- `poko`
+- `posa`
+- `rima`
+- `salu`
+- `seto`
+- `subasono`
+- `suki`
+- `vale`
+- `yara`
+<!-- PROPOSED-END -->

@@ -8,18 +8,26 @@ Kona is an engineered constructed language designed specifically for high-effici
 
 ## Key Highlights
 
-- **Purely Functional**: Every sentence evaluates as an algebraic pipeline ($\text{Action}(\text{Target}) \mid \text{Invariants} \mid> \text{Continuation}$) with zero parse ambiguity.
-- **Acoustic Infallibility**: Built on 5 cardinal vowels (`/a, e, i, o, u/`) and a strict $(C)V$ moraic cadence inspired by Polynesian and Austronesian phonetics. Zero homophones, zero consonant clusters.
+- **Purely Functional**: Every sentence evaluates as an algebraic pipeline ($\text{Action}(\text{Target}) \mid \text{Invariants} \mid> \text{Continuation}$). The grammar is a strict recursive descent over a closed lexicon: an unknown word, an unbalanced paren or a stray `ali` is a syntax error, never a silently-accepted guess.
+- **Acoustic Separation**: 5 cardinal vowels (`/a, e, i, o, u/`) and a strict $(C)(G)V(n)$ moraic cadence. Machine-checked invariant: zero homophones, zero true consonant clusters, and **no two free lexemes differ by a single confusable phoneme** (`python3 kona.py --validate`).
 - **The 5 Universal Derivational Affixes**:
   1. `no-` (Polar Opposite): `bono` (good) $\to$ `nobono` (bad)
   2. `-koso` (Physical Hardware): `kisi` (hear) $\to$ `kisikoso` (microphone)
   3. `-peji` (Display / Surface): `visi` (see) $\to$ `visipeji` (screen / monitor)
   4. `-kaba` (Environment / Workspace): `kodo` (code) $\to$ `kodokaba` (IDE / workspace)
   5. `-yoti` (Specialist / Role): `kodo` (code) $\to$ `kodoyoti` (developer)
-- **Token & Keystroke Compression**: Delivers 50–70% token reduction compared to natural language English prompts.
-- **Dual-Modality Isomorphism**:
-  - **Spoken Kona**: `dekwe poya "security" te, vetori kodo notori "migrations" te, fasa mesa.`
-  - **Written Shorthand**: `kwe.de @repo:"security" |> tori.ve @code !tori @"migrations" |> fasa #table`
+- **Keystroke Compression**: ~70% fewer characters than natural English.
+- **Token cost — measured, not claimed**: Kona uses **+61.6% more tokens** than
+  terse English of equivalent meaning (`cl100k_base`, 10 tasks). Its roots are
+  invented strings absent from the BPE vocabulary and average **1.98 tokens per
+  word**; the derivational compounds are worst (`kodoyoti` = 4 tokens vs
+  `developer` = 1). The former "50–70% reduction" headline compared against
+  deliberately padded English using a fallback estimator with no vocabulary.
+  Kona's wins are unambiguous structure and keystrokes — not tokens.
+  Reproduce: `./bench-env/bin/python benchmark_tokens.py`.
+- **Dual-Modality Isomorphism** — both forms compile to a byte-identical AST (asserted by the test suite):
+  - **Spoken Kona**: `dekwe poya "security" te, vetori kodo notori "migrations" te, fasa mesa`
+  - **Written Shorthand**: `kwe.de @repo:"security" |> tori.ve @code !"migrations" |> fasa #table`
 
 ---
 
@@ -36,8 +44,12 @@ Kona is an engineered constructed language designed specifically for high-effici
 
 Open [`playground.html`](playground.html) in any web browser to access the live dual-modality playground:
 - Real-time compiler generating AST, emitted agent tool calls, and English translations as you type.
-- Live token compression meter measuring keystroke savings against natural English.
-- Native speech synthesis vocalizer using authentic $(C)V$ moraic cadence.
+- Live keystroke compression meter against natural English.
+- Native speech synthesis vocalizer using $(C)(G)V(n)$ moraic cadence.
+
+The playground's lexicon is generated from `kona.py` by `generate_artifacts.py`,
+so it cannot drift from the reference compiler. Note that the playground still
+carries its own JavaScript *parser*; only the vocabulary is shared.
 
 ---
 
@@ -53,9 +65,29 @@ Run the unit and regression test suite:
 python3 test_kona.py
 ```
 
-Run the automated token and character compression benchmark:
+Check the lexicon against the phonology in the specification:
 ```bash
-python3 benchmark_tokens.py
+python3 kona.py --validate
+```
+
+Regenerate derived artifacts (EBNF terminals, playground lexicon) from `kona.py`:
+```bash
+python3 generate_artifacts.py          # rewrite
+python3 generate_artifacts.py --check  # CI: fail if stale
+```
+
+Fuzz the whole compile path (parse + tool-call emission + translation):
+```bash
+python3 fuzz_kona.py
+```
+
+Run the token and compression benchmark. Install `tiktoken` first — without it
+the script falls back to a vocabulary-free estimator that materially overstates
+Kona's advantage, and it says so loudly:
+```bash
+python3 -m venv bench-env
+./bench-env/bin/python -m pip install -r requirements-dev.txt
+./bench-env/bin/python benchmark_tokens.py
 ```
 
 Run the linguistic benchmark evaluation suite:
@@ -82,26 +114,24 @@ Kona includes TextMate syntax highlighting for VS Code and compatible editors:
 - Config: [`language-configuration.json`](language-configuration.json)
 - Sample: [`example.kona`](example.kona)
 
-### VS Code Installation
+### VS Code Extension
 
-To install the local extension for VS Code:
+Build and package the extension (bundles the language client via esbuild):
 ```bash
-# 1. Create a local extension directory
-mkdir -p ~/.vscode/extensions/kona-lang
-
-# 2. Copy the extension files over
-cp package.json ~/.vscode/extensions/kona-lang/
-cp language-configuration.json ~/.vscode/extensions/kona-lang/
-cp -r syntaxes ~/.vscode/extensions/kona-lang/
-
-# 3. Reload VS Code (Cmd+Shift+P -> "Developer: Reload Window")
+npm install
+npm run compile     # or: npm run package   -> kona-language-<version>.vsix
+code --install-extension kona-language-0.3.0.vsix
 ```
+
+The extension starts `kona_lsp.py`. It picks an interpreter in this order:
+`kona.pythonPath` setting → the interpreter selected in the Python extension →
+a workspace-local `lsp-env` (**trusted workspaces only**) → `python3` on PATH.
 
 ---
 
-## Proven Benchmarks
+## Linguistic Benchmarks
 
-Kona has been verified against three formal linguistic stress-tests (`python3 kona.py --benchmarks`):
+Kona is exercised against three linguistic stress-tests (`python3 kona.py --benchmarks`):
 1. **Collaborative Problem-Solving & Debugging Dialogue**: Technical dispute, relative clauses (`ke`), durative aspect (`dura`), and contrastive preferences.
 2. **Technical System Specification**: Authentication token expiry, caching constraints, and sequential procedure execution.
 3. **The North Wind and the Sun (Universal Narrative Benchmark)**: Narrative storytelling, causative constructions (`maki`), and correlative comparatives (`masi A te, masi B`).

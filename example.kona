@@ -1,11 +1,15 @@
 // Kona (コナビ) Language Examples
 // Purely functional, acoustically engineered syntax for AI agents
+//
+// Every line below compiles. Verify with:
+//   python3 kona.py "$(sed -n '8p' example.kona)"
 
-// 1. Deep code analysis and tabular output
-kwe.de @repo:"security" |> tori.ve @code !tori @"migrations" |> fasa #table
+// 1. Deep code analysis, guarded dry-run edit, tabular output
+kwe.de @repo:"security" |> tori.ve @code !"migrations" |> fasa #table
 
 // 2. Web query and structured JSON extraction
-kwe @web("AWS Azure Q3 revenue") |> fasa #json
+//    Arguments use @target:"value" -- parentheses open a nested pipeline.
+kwe @web:"AWS Azure Q3 revenue" |> fasa #json
 
 // 3. Conditional deployment with fallback
 si teli bono |> yuki @task :else: fasa @bug
@@ -13,5 +17,11 @@ si teli bono |> yuki @task :else: fasa @bug
 // 4. Multi-target device inspection
 visi @cam @display |> teli |> do @msg
 
-// 5. Spoken equivalent syntax
+// 5. Spoken form of example 1 -- compiles to the identical AST
 dekwe poya "security" te, vetori kodo notori "migrations" te, fasa mesa
+
+// 6. Nested pipeline, numerals (nipaduwo = 120) and scoping
+si teli bono te, (kwe nipaduwo ina poya te, fasa poti) ali fasa baki
+
+// 7. Grammatical aspect: progressive, perfective, habitual
+yukiba te, makita te, fasasa
