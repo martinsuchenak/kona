@@ -32,3 +32,10 @@ __pycache__/
 # Benchmark artifacts
 *.wav
 *.aiff
+
+
+# AI
+.skopos-session
+.skopos/
+# Benchmark virtualenv
+bench-env/
