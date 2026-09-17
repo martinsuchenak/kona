@@ -2,7 +2,7 @@
   "name": "kona-language",
   "displayName": "Kona Language Support",
   "description": "Language support, syntax highlighting, and snippets for the Kona functional agent language",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "publisher": "kona-lang",
   "engines": {
     "vscode": "^1.93.0"
@@ -30,20 +30,34 @@
         "scopeName": "source.kona",
         "path": "./syntaxes/kona.tmLanguage.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Kona",
+      "properties": {
+        "kona.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the Python interpreter used to run the Kona language server. Leave empty to use the interpreter selected in the Python extension, or python3 from PATH. A workspace-local lsp-env is only used in trusted workspaces."
+        }
+      }
+    }
   },
   "main": "./out/extension.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc -p ./"
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production && vsce package",
+    "typecheck": "tsc -p ./ --noEmit",
+    "test": "python3 test_kona.py && python3 kona.py --validate && python3 generate_artifacts.py --check",
+    "vscode:prepublish": "node esbuild.js --production"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/martinsuchenak/kona.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Martin Suchenak",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/martinsuchenak/kona/issues"
@@ -58,5 +72,11 @@
     "@vscode/vsce": "^4.0.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In an untrusted workspace the language server never runs an interpreter found inside that workspace."
+    }
   }
 }

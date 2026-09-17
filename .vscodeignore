@@ -1,10 +1,39 @@
-.git/
-whisper-env/
-lsp-env/
-node_modules/
-.npm/
-__pycache__/
-*.wav
-*.aiff
-*.vsix
-!out/
+# Publish an allowlist-shaped bundle: exclude everything heavy or dev-only.
+# NOTE: a bare '*.wav' only matches the repository root. The audio corpus lives
+# in audio/, so it needs '**' -- without it the published vsix was 5.3MB.
+**/*.wav
+**/*.aiff
+**/*.vsix
+
+.git/**
+.github/**
+.vscode/**
+node_modules/**
+whisper-env/**
+lsp-env/**
+.npm/**
+**/__pycache__/**
+**/*.pyc
+audio/**
+sample.wav
+
+# Dev-only scripts that were being shipped to users
+patch_lsp*.py
+test_diag*.py
+test_lsp*.py
+fuzz_kona.py
+benchmark_tokens.py
+acoustic_benchmark.py
+vocal_test.py
+whisper_wer_test.py
+prompt_tuning_test.py
+generate_artifacts.py
+test_kona.py
+playground.html
+src/**
+tsconfig.json
+esbuild.js
+.skopos-session
+.skopos/**
+.DS_Store
+.gitignore
