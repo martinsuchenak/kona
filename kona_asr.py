@@ -7,18 +7,44 @@ except ImportError:
     print("Error: Whisper is not installed. Run from whisper-env.")
     sys.exit(1)
 
-from kona import ACTIONS, MODIFIERS, TARGETS
+from kona import ACTIONS, MODIFIERS, TARGETS, PARTICLES, QUALITIES, FORMATS
 
-def get_lexicon_prompt():
-    # Gather all Kona primitives to inject into Whisper's context
-    actions = list(ACTIONS.keys())
-    targets = list(TARGETS.keys())
-    modifiers = list(MODIFIERS.keys())
-    # Additional structural words
-    structural = ["si", "te", "ali", "nomi", "fino", "ke", "kito", "pato", "oli", "uni", "notori", "no"]
-    
-    all_words = actions + targets + modifiers + structural
-    return " ".join(all_words)
+# Whisper's conditioning prompt is capped at 224 tokens.
+WHISPER_PROMPT_TOKEN_BUDGET = 224
+
+
+def get_lexicon_prompt(budget=WHISPER_PROMPT_TOKEN_BUDGET):
+    """Build Whisper's conditioning prompt from the live lexicon.
+
+    Every word class comes from kona.py. The structural words used to be a
+    hand-written list here, which had already drifted: it named `kito`, `pato`,
+    `oli` and `uni`, none of which the compiler knew at the time.
+
+    The lexicon now exceeds Whisper's prompt budget, so the prompt is
+    prioritised rather than silently truncated mid-list by the decoder: the
+    closed classes that carry sentence structure come first, then actions, then
+    targets, which are the most recoverable from context.
+    """
+    ordered = (
+        list(PARTICLES)          # structure: si, te, ali, ke, ina, uta, ...
+        + list(MODIFIERS)        # bound prefixes
+        + list(FORMATS)
+        + list(QUALITIES)
+        + list(ACTIONS)
+        + list(TARGETS)
+    )
+
+    # Whisper counts tokens, not words; Kona roots are out-of-vocabulary and
+    # average well above one token each. Budget conservatively at ~2 tokens per
+    # word so the tail is dropped here, by priority, instead of arbitrarily.
+    max_words = max(1, budget // 2)
+    selected = ordered[:max_words]
+    dropped = len(ordered) - len(selected)
+    if dropped:
+        print(f"[lexicon prompt] {len(selected)} of {len(ordered)} words sent; "
+              f"{dropped} lowest-priority targets omitted to stay within "
+              f"Whisper's {budget}-token prompt limit.")
+    return " ".join(selected)
 
 def transcribe_audio(audio_path, model_size="base"):
     if not os.path.exists(audio_path):
@@ -29,9 +55,7 @@ def transcribe_audio(audio_path, model_size="base"):
     model = whisper.load_model(model_size)
     
     prompt = get_lexicon_prompt()
-    
-    # Whisper's context window is 224 tokens. 
-    # Our current lexicon fits easily. If it grows >200 words, Whisper will truncate the prompt.
+
     print(f"Transcribing '{audio_path}' with Kona zero-shot prompt tuning...")
     result = model.transcribe(audio_path, language="en", initial_prompt=prompt)
     
