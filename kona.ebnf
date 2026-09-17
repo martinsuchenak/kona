@@ -56,155 +56,262 @@ ActionExpression
     | BaseAction ;
 
 ModifiedAction
-    = PrefixModifier , [ "-" ] , BaseAction
-    | BaseAction , "." , PostfixModifier ;
+    = PrefixModifier , [ "-" ] , (* BEGIN GENERATED -- edit kona.py, then run generate_artifacts.py *)
+
+(* Terminal vocabularies below are generated from kona.py. Do not edit
+   them here: edit the lexicon and regenerate. *)
 
 BaseAction
-    = "kwe"    (* search / query / grep *)
-    | "visi"   (* view / inspect / cat *)
-    | "maki"   (* create / scaffold *)
-    | "tori"   (* transform / edit / refactor *)
-    | "teli"   (* verify / test / benchmark *)
-    | "nuki"   (* delete / prune / purge *)
-    | "yuki"   (* execute / run / deploy *)
-    | "fasa"   (* summarize / explain / report *)
-    | "leke"   (* fetch / pull / download *)
-    | "do"     (* emit / send / notify *)
-    | "plani"  (* plan / schedule *)
-    | "oki"    (* start / initialize *)
-    | "fini"   (* end / terminate *)
-    | "mova"   (* move / transfer *)
-    | "ira"    (* navigate / go *)
-    | "para"   (* pause / halt *)
-    | "posi"   (* can / able *)
-    | "debi"   (* must / obligation *)
-    | "doko"   (* agree / align *)
-    | "nodoko" (* disagree / dispute *)
-    | "poki"   (* propose / suggest *)
-    | "keti"   (* decide / resolve *)
-    | "sapi"   (* understand / know *)
-    | "veni"   (* arrive / approach *)
-    | "peli"   (* defer / delay *)
-    | "tapi"   (* type / input *)
-    | "kiri"   (* write / author *)
+    = "debi"            (* must *)
+    | "do"              (* emit *)
+    | "fasa"            (* summarize *)
+    | "fini"            (* finish *)
+    | "fiso"            (* fix *)
+    | "ira"             (* navigate *)
+    | "kada"            (* iterate *)
+    | "keti"            (* decide *)
+    | "kiri"            (* write *)
+    | "kisi"            (* listen *)
+    | "koma"            (* compare *)
+    | "kwe"             (* search *)
+    | "leke"            (* fetch *)
+    | "maki"            (* create *)
+    | "mova"            (* move *)
+    | "nolo"            (* reject *)
+    | "nuki"            (* delete *)
+    | "oki"             (* start *)
+    | "para"            (* pause *)
+    | "peli"            (* delay *)
+    | "pilani"          (* plan *)
+    | "poki"            (* propose *)
+    | "posi"            (* can *)
+    | "sapi"            (* know *)
+    | "tapi"            (* type *)
+    | "teli"            (* verify *)
+    | "tori"            (* transform *)
+    | "veni"            (* arrive *)
+    | "visi"            (* view *)
+    | "wapo"            (* agree *)
+    | "yalo"            (* approve *)
+    | "yuki"            (* execute *)
     ;
-
-PrefixModifier
-    = "de"     (* deep / exhaustive *)
-    | "su"     (* fast / brief *)
-    | "ve"     (* speculative / dry-run *)
-    | "no"     (* negative guard / prohibited *)
-    | "oto"    (* autonomous / auto *)
-    | "re"     (* retry / repeat / loop *)
-    | "suno"   (* zero / immediate / force *)
-    | "dura"   (* durative / continuous *)
-    | "pasa"   (* past / audit log *)
-    | "futu"   (* future / forecast *)
-    ;
-
-PostfixModifier
-    = PrefixModifier ;
-
-
-(* --- 4. Guard Constraints & Invariants --- *)
-GuardConstraint
-    = ShorthandGuard
-    | SpokenGuard ;
-
-ShorthandGuard
-    = "!" , BaseAction , [ Whitespace ] , ( TargetReference | LiteralValue ) ;
-
-SpokenGuard
-    = ( "notori" | "no-" , BaseAction | "no" , BaseAction ) , [ Whitespace ] , ( TargetReference | LiteralValue ) ;
-
-
-(* --- 5. Targets & Entities --- *)
-TargetReference
-    = ShorthandTarget
-    | SpokenTarget ;
-
-ShorthandTarget
-    = "@" , TargetIdentifier , [ TargetArgument ] ;
-
-TargetArgument
-    = ":" , ( StringLiteral | Identifier )
-    | "(" , StringLiteral , ")" ;
-
-SpokenTarget
-    = TargetIdentifier , [ Whitespace , StringLiteral ] ;
-
-TargetIdentifier
-    = CompoundTarget
-    | BaseTarget ;
 
 BaseTarget
-    (* Code & Engineering *)
-    = "kodo"     (* code *)
-    | "fili"     (* file *)
-    | "poya"     (* repo *)
-    | "vasi"     (* version / git *)
-    | "baki"     (* bug / issue *)
-    | "tesi"     (* test *)
-    | "deli"     (* container / docker *)
-    | "sisa"     (* system / os *)
-    | "seli"     (* lock / mutex *)
-    (* Network & Data *)
-    | "veba"     (* web *)
-    | "peji"     (* page / url *)
-    | "liki"     (* link *)
-    | "neto"     (* network / api *)
-    | "data"     (* data / db *)
-    | "memo"     (* memory / context *)
-    | "seku"     (* secret / auth *)
-    | "tafu"     (* task *)
-    | "meso"     (* message / email *)
-    (* Temporal & Measurement *)
-    | "toko"     (* time / duration *)
-    | "sekunda"  (* second *)
-    | "minuta"   (* minute *)
-    | "kora"     (* hour *)
-    | "dya"      (* day *)
-    | "wiki"     (* week *)
-    (* Physical & Nature *)
-    | "vento"    (* wind / air *)
-    | "soli"     (* sun / solar *)
-    | "norte"    (* north *)
-    | "tela"     (* cloak / fabric *)
-    | "kalu"     (* thermal / heat *)
-    | "luce"     (* light *)
-    | "powa"     (* power / energy *)
-    (* Persons & Pronouns *)
-    | "mi"       (* user / speaker *)
-    | "tu"       (* agent / listener *)
-    | "ona"      (* external / third-party *)
-    | "koli"     (* team / collective *)
-    | "yoti"     (* person / user *)
-    (* Quantifiers & Pointers *)
-    | "oli"      (* all / every *)
-    | "uni"      (* some / specific *)
-    | "pato"     (* previous output *)
-    | "kito"     (* this / current *)
+    = "baki"            (* bug_issue *)
+    | "buta"            (* button_element *)
+    | "data"            (* data_db *)
+    | "datakaba"        (* data_warehouse *)
+    | "dya"             (* day_unit *)
+    | "figa"            (* configuration *)
+    | "fili"            (* file *)
+    | "fogo"            (* error_crash *)
+    | "foma"            (* input_form *)
+    | "fuka"            (* container_pod *)
+    | "fumo"            (* function_method *)
+    | "irayoti"         (* traveler *)
+    | "kalu"            (* thermal_warmth *)
+    | "karo"            (* vehicle_transport *)
+    | "kila"            (* class_module *)
+    | "kisikoso"        (* microphone *)
+    | "kodo"            (* code *)
+    | "kodokaba"        (* workspace_ide *)
+    | "kodoyoti"        (* developer *)
+    | "koli"            (* team_collective *)
+    | "kora"            (* hour_unit *)
+    | "koso"            (* tool_instrument *)
+    | "kusa"            (* cluster_node *)
+    | "liba"            (* document_book *)
+    | "liki"            (* link *)
+    | "luke"            (* light_illumination *)
+    | "makiyoti"        (* designer_creator *)
+    | "memo"            (* memory_context *)
+    | "meso"            (* message_email *)
+    | "mi"              (* user_speaker *)
+    | "minuta"          (* minute_unit *)
+    | "misu"            (* water_liquid *)
+    | "moni"            (* money_cost *)
+    | "mori"            (* root_cause *)
+    | "nami"            (* food_sustenance *)
+    | "neto"            (* network_api *)
+    | "noreti"          (* north_direction *)
+    | "ona"             (* external_entity *)
+    | "pako"            (* container_docker *)
+    | "pakokaba"        (* sandbox_env *)
+    | "parakoso"        (* brake_interrupt *)
+    | "peji"            (* page_url *)
+    | "pika"            (* image_media *)
+    | "pota"            (* port_endpoint *)
+    | "powa"            (* power_energy *)
+    | "powakoso"        (* battery_power *)
+    | "poya"            (* repo *)
+    | "raya"            (* array_list *)
+    | "rego"            (* rule_policy *)
+    | "rogi"            (* log_trace *)
+    | "seku"            (* security_secret *)
+    | "sekuni"          (* second_unit *)
+    | "seli"            (* resource_lock *)
+    | "simo"            (* symptom_metric *)
+    | "sisa"            (* system_os *)
+    | "sito"            (* string_text *)
+    | "soli"            (* sun_solar *)
+    | "sono"            (* sound_audio *)
+    | "sonokoso"        (* speaker *)
+    | "tafu"            (* task *)
+    | "tapikoso"        (* keyboard *)
+    | "teka"            (* building_office *)
+    | "tela"            (* fabric_cloak *)
+    | "teliyoti"        (* qa_tester *)
+    | "tesi"            (* test_spec *)
+    | "toka"            (* token_key *)
+    | "toko"            (* time_interval *)
+    | "tokofini"        (* deadline *)
+    | "tokofutu"        (* forecast_roadmap *)
+    | "tokokoso"        (* timer_clock *)
+    | "tokooki"         (* start_schedule *)
+    | "tokopasa"        (* history_log *)
+    | "tu"              (* agent_listener *)
+    | "tuma"            (* memory_dump *)
+    | "vari"            (* variable_state *)
+    | "vasi"            (* version_git *)
+    | "veba"            (* web *)
+    | "venito"          (* wind_air *)
+    | "visikoso"        (* camera *)
+    | "visipeji"        (* screen_display *)
+    | "vito"            (* state_mode *)
+    | "wada"            (* word_token *)
+    | "wela"            (* location_coordinates *)
+    | "wiki"            (* week_unit *)
+    | "wina"            (* window_modal *)
+    | "yoti"            (* user *)
     ;
 
-CompoundTarget
-    = BaseTarget , AffixSuffix
-    | NominalizedTarget ;
-
-NominalizedTarget
-    = BaseAction , "na" ;
-
-AffixSuffix
-    = "koso"     (* physical device: kisikoso, tapikoso *)
-    | "peji"     (* screen / surface: visipeji, mesapeji *)
-    | "kaba"     (* workspace / room: kodokaba, delikaba *)
-    | "yoti"     (* specialist: kodoyoti, makiyoti, irayoti *)
-    | "fini"     (* deadline: tokofini *)
-    | "oki"      (* start: tokooki *)
-    | "pasa"     (* history log: tokopasa *)
-    | "futu"     (* forecast: tokofutu *)
+Modifier
+    = "de"              (* deep/exhaustive *)
+    | "dura"            (* continuous/in_progress *)
+    | "futu"            (* future/scheduled *)
+    | "no"              (* prohibit/guard_not *)
+    | "oto"             (* autonomous/auto *)
+    | "pasa"            (* past/completed *)
+    | "re"              (* repeat/retry/loop *)
+    | "su"              (* fast/brief *)
+    | "suno"            (* zero/without_delay *)
+    | "ve"              (* dry_run/speculative *)
     ;
 
+FormatSpecifier
+    = "difa"            (* diff *)
+    | "jano"            (* json *)
+    | "mesa"            (* table *)
+    | "poti"            (* bullet_list *)
+    | "puro"            (* plain_text *)
+    ;
 
+Particle
+    = "ali"             (* else *)
+    | "deko"            (* quantifier_ten *)
+    | "duo"             (* quantifier_two *)
+    | "fino"            (* literal_close *)
+    | "ina"             (* scope_inside *)
+    | "kasi"            (* causal_because *)
+    | "ke"              (* relative_linker *)
+    | "kito"            (* deixis_this_current *)
+    | "kono"            (* conclusive_therefore *)
+    | "lo"              (* logical_or *)
+    | "mapo"            (* logical_and *)
+    | "masi"            (* comparative_more *)
+    | "muto"            (* quantifier_many *)
+    | "nomi"            (* literal_open *)
+    | "notori"          (* guard_prohibit *)
+    | "oli"             (* quantifier_all *)
+    | "pato"            (* deixis_previous_output *)
+    | "pero"            (* contrast_but *)
+    | "sama"            (* equative_same *)
+    | "si"              (* if *)
+    | "supera"          (* superlative_above *)
+    | "te"              (* pipe_then *)
+    | "ti"              (* topic_marker *)
+    | "uni"             (* quantifier_some *)
+    | "uta"             (* scope_outside *)
+    | "ye"              (* affirmative_yes *)
+    ;
+
+Digit
+    = "bi"              (* 8 *)
+    | "du"              (* 2 *)
+    | "fo"              (* 4 *)
+    | "go"              (* 9 *)
+    | "ke"              (* 7 *)
+    | "mu"              (* 5 *)
+    | "pa"              (* 1 *)
+    | "sa"              (* 6 *)
+    | "ti"              (* 3 *)
+    | "wo"              (* 0 *)
+    ;
+
+AspectSuffix
+    = "ba"              (* progressive *)
+    | "sa"              (* habitual *)
+    | "ta"              (* perfective *)
+    ;
+
+DerivationalSuffix
+    = "kaba"            (* environment_space *)
+    | "koso"            (* physical_device *)
+    | "peji"            (* display_surface *)
+    | "yoti"            (* specialist_role *)
+    ;
+
+ShorthandTargetAlias
+    = "agent"           (* = tu *)
+    | "api"             (* = neto *)
+    | "auth"            (* = seku *)
+    | "battery"         (* = powakoso *)
+    | "bug"             (* = baki *)
+    | "cam"             (* = visikoso *)
+    | "code"            (* = kodo *)
+    | "container"       (* = pako *)
+    | "data"            (* = data *)
+    | "db"              (* = data *)
+    | "deadline"        (* = tokofini *)
+    | "display"         (* = visipeji *)
+    | "docker"          (* = pako *)
+    | "file"            (* = fili *)
+    | "git"             (* = vasi *)
+    | "issue"           (* = baki *)
+    | "kb"              (* = tapikoso *)
+    | "link"            (* = liki *)
+    | "lock"            (* = seli *)
+    | "log"             (* = rogi *)
+    | "logs"            (* = rogi *)
+    | "mail"            (* = meso *)
+    | "memo"            (* = memo *)
+    | "memory"          (* = memo *)
+    | "mic"             (* = kisikoso *)
+    | "msg"             (* = meso *)
+    | "page"            (* = peji *)
+    | "pod"             (* = fuka *)
+    | "repo"            (* = poya *)
+    | "sandbox"         (* = pakokaba *)
+    | "screen"          (* = visipeji *)
+    | "secret"          (* = seku *)
+    | "task"            (* = tafu *)
+    | "team"            (* = koli *)
+    | "test"            (* = tesi *)
+    | "url"             (* = peji *)
+    | "user"            (* = mi *)
+    | "vcs"             (* = vasi *)
+    | "web"             (* = veba *)
+    | "workspace"       (* = kodokaba *)
+    ;
+
+(* Phonology, enforced by kona.validate_lexicon() *)
+Consonant = "b" | "d" | "f" | "g" | "j" | "k" | "l" | "m" | "n" | "p" | "r" | "s" | "t" | "v" | "w" | "y" ;
+Vowel     = "a" | "e" | "i" | "o" | "u" ;
+Glide     = "w" | "y" ;
+Syllable  = [ Consonant ] , [ Glide ] , Vowel ;
+Word      = Syllable , { Syllable } , [ "n" ] ;
+
+(* END GENERATED *)
 (* --- 6. Relative Clauses & Connectors --- *)
 RelativeClause
     = TargetReference , Whitespace , "ke" , Whitespace , ClauseBody ;

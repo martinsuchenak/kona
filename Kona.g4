@@ -1,62 +1,103 @@
 grammar Kona;
 
 /* ============================================================================
-   Kona Language ANTLR4 Grammar Specification
-   This file serves as a mathematical proof of Kona's LL(*) unambiguous parsing.
+   Kona Language -- ANTLR4 Reference Grammar
+
+   Scope note: this file is a machine-checkable statement of Kona's SURFACE
+   syntax -- how an utterance is tokenised and how stages, conditions and
+   nested pipelines nest. It is not, and does not claim to be, a proof of
+   semantic unambiguity.
+
+   Unambiguity in Kona rests on two things this context-free grammar cannot
+   express, both of which are enforced in kona.py and covered by tests:
+
+     1. LEXICAL CLOSURE. `word` below matches any identifier. The parser
+        accepts only words present in the lexicon (ACTIONS, TARGETS, MODIFIERS,
+        FORMATS, PARTICLES) or derivable from one by a documented affix rule.
+        Everything else is a syntax error. See Parser.parse_action_expr.
+
+     2. WHOLE-WORD-FIRST RESOLUTION. A word that is itself a lexeme is never
+        decomposed, so roots that merely begin with a modifier (veba, rego,
+        nolo, debi) cannot be mis-segmented as ve+ba, re+go, no+lo, de+bi.
+        Decomposition is attempted only when whole-word lookup fails.
+
+   A previous version of this file asserted it was "a mathematical proof of
+   Kona's LL(*) unambiguous parsing". It was not: it defined `spoken_literal`
+   twice (so ANTLR would reject it outright) and its action rule was `token+`,
+   which accepts arbitrary word salad and therefore proves nothing.
    ============================================================================ */
 
+// --- PARSER RULES ---------------------------------------------------------
+
+utterance    : pipeline EOF ;
+
 pipeline     : stage (PIPE stage)* ;
-stage        : condition_prefix? body_expr alternative_branch? ;
 
-condition_prefix : SI condition (PIPE | COLON) ;
-condition    : (WORD | STRING | TARGET_AT | GUARD)+ ;
+stage        : conditionPrefix? body alternativeBranch? ;
 
-alternative_branch : ALI stage ;
+conditionPrefix : SI condition PIPE ;
 
-body_expr    : nested_pipeline
-             | action_expr
+condition    : element+ ;
+
+alternativeBranch : ALI stage ;
+
+body         : nestedPipeline
+             | actionExpr
              ;
 
-nested_pipeline : LPAREN pipeline RPAREN ;
+nestedPipeline : LPAREN pipeline RPAREN ;
 
-action_expr  : token+ ;
+/* An action expression is a sequence of elements carrying at most one matrix
+   predicate. The one-predicate-per-stage rule, and the clause particles that
+   license a subordinate predicate, are enforced in the parser -- see
+   CLAUSE_PARTICLES and MODALS in kona.py. */
+actionExpr   : element+ ;
 
-
-token        : WORD 
-             | FORMAT_HASH 
-             | TARGET_AT 
-             | GUARD 
-             | STRING 
-             | spoken_literal 
-             | NUMBER_LITERAL
-             | SCOPE
-             | BOOLEAN
+element      : WORD
+             | STRING
+             | TARGET_AT
+             | FORMAT_HASH
+             | GUARD
+             | spokenLiteral
+             | SI
              ;
 
-spoken_literal : NOMI .*? FINO ;
+spokenLiteral : NOMI ( WORD | STRING )* FINO ;
 
-/* --- LEXER RULES --- */
-BOOLEAN      : 'lo' ;
-SCOPE        : 'ina' | 'uta' ;
-NUMBER_LITERAL : 'ni' ( 'ze' | 'pa' | 'du' | 'ti' | 'fo' | 'mu' | 'sa' | 'ke' | 'bi' | 'go' )+ ;
+// --- LEXER RULES ----------------------------------------------------------
 
+/* PIPE must precede WORD so that a standalone 'te' is a stage separator while
+   'teli' remains a single word (ANTLR prefers the longest match, then the
+   earliest rule). ';' is an utterance separator equivalent to spoken 'te,'. */
+PIPE         : '|>' | 'te' WS* ',' | 'te' | ';' ;
 
-spoken_literal : NOMI .*? FINO ;
-
-/* --- LEXER RULES --- */
-PIPE         : '|>' | 'te' ','? ;
 LPAREN       : '(' ;
 RPAREN       : ')' ;
+
 SI           : 'si' ;
 ALI          : 'ali' | ':else:' ;
-COLON        : ':' ;
 NOMI         : 'nomi' ;
 FINO         : 'fino' ;
 
-FORMAT_HASH  : '#' ('table'|'list'|'json'|'raw'|'diff') ;
-GUARD        : '!' [a-zA-Z_\-]+ | 'notori' | 'no-' [a-zA-Z_\-]+ ;
-TARGET_AT    : '@' [a-zA-Z_\-]+ (':' ('"' ~'"'* '"' | '\'' ~'\''* '\''))? ;
-WORD         : [a-zA-Z_\-]+ ;
+FORMAT_HASH  : '#' ( 'table' | 'list' | 'json' | 'raw' | 'diff' ) ;
+
+/* '!"literal"' is the shorthand counterpart of spoken 'notori "literal"'. */
+GUARD        : '!' STRING
+             | '!' IDENT
+             | 'notori'
+             | 'no-' IDENT
+             ;
+
+TARGET_AT    : '@' IDENT ( ':' ( STRING | IDENT ) )? ;
+
+/* Dotted and hyphenated affixation (kwe.de, su-kwe) is one word. */
+WORD         : IDENT ( ( '.' | '-' ) IDENT )* ;
+
 STRING       : '"' ~'"'* '"' | '\'' ~'\''* '\'' ;
+
+fragment IDENT : [a-zA-Z_] [a-zA-Z0-9_]* ;
+
+/* A bare comma is a prosodic clause pause with no semantic content. */
+COMMA        : ',' -> skip ;
 
 WS           : [ \t\r\n]+ -> skip ;
