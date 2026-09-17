@@ -1,10 +1,8 @@
 import random
+import sys
 import traceback
-from kona import parse_kona
 
-print("==========================================================")
-print(" KONA COMPILER FUZZER (Property-Based Chaos Testing)")
-print("==========================================================")
+from kona import parse_kona
 
 # Token pools
 VALID_ACTIONS = ["kwe", "visi", "maki", "tori", "teli", "nuki", "yuki", "fasa"]
@@ -13,61 +11,87 @@ VALID_ASPECTS = ["ba", "ta", "sa"]
 VALID_TARGETS = ["kodo", "fili", "data", "poya", "seku"]
 VALID_GUARDS = ["notori", "!auth", "no-kodo"]
 VALID_FORMATS = ["mesa", "jano", "#table", "#json"]
-STRUCTURAL = ["te,", "|>", "si", "ali", "nomi", "fino", "(", ")"]
+STRUCTURAL = ["te,", "|>", "si", "ali", "nomi", "fino", "(", ")", "ke", "pero"]
 
-# Malformed / Chaos tokens
+# Malformed / chaos tokens
 CHAOS = [
     "", " ", "\n", "\t", "123", "!@#$%", "kwe-", "-kwe", "@", "@@", "##", "#",
     "te te", "si si", "((", "))", "()", "nomi nomi", '"', "'", '"unclosed',
     "kwena", "fasasa", "yukiba", "@kodo:\"bad",
-    "\x00", "\xFF", "😈", "kwe\n|>fasa"
+    "\x00", "\xFF", "😈", "kwe\n|>fasa",
 ]
+
 
 def generate_random_token():
     pool = random.choice([
         VALID_ACTIONS, VALID_MODIFIERS, VALID_TARGETS, VALID_GUARDS,
-        VALID_FORMATS, STRUCTURAL, CHAOS
+        VALID_FORMATS, STRUCTURAL, CHAOS,
     ])
     tok = random.choice(pool)
-    
-    # Randomly construct complex valid words occasionally
+
+    # Occasionally build a complex well-formed word
     if random.random() > 0.8:
         tok = f"{random.choice(VALID_MODIFIERS)}-{random.choice(VALID_ACTIONS)}{random.choice(VALID_ASPECTS)}"
-    
+
     return tok
 
-def fuzz_compiler(iterations=10000):
-    crashes = 0
-    passed = 0
+
+def fuzz_compiler(iterations=10000, seed=None):
+    """Fuzz the WHOLE compile path.
+
+    The previous version stopped at parse_kona() and reported the compiler
+    "mathematically robust". Every AST consumer -- to_tool_calls() and
+    to_english() -- has to be exercised too: running the identical token pools
+    through them surfaced 1656 TypeErrors in 20000 inputs, on inputs as short
+    as 'ali ve'. A crash in the emitter is just as much a compiler bug as a
+    crash in the parser.
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    parsed = 0
     syntax_errors = 0
-    
-    for i in range(iterations):
-        # Build a random string of 1 to 15 tokens
+    crashes = 0
+    seen = {}
+
+    for _ in range(iterations):
         length = random.randint(1, 15)
         text = " ".join(generate_random_token() for _ in range(length))
-        
+
         try:
             ast = parse_kona(text)
-            passed += 1
+            # These are the stages the old fuzzer never reached.
+            ast.to_tool_calls()
+            ast.to_english()
+            parsed += 1
         except SyntaxError:
-            # SyntaxError is a GRACEFUL failure. The compiler successfully caught bad code.
+            # A graceful, reported rejection. This is correct behaviour.
             syntax_errors += 1
         except Exception as e:
-            # Any other exception (IndexError, TypeError, AttributeError) is a COMPILER CRASH!
             crashes += 1
-            if crashes <= 3:
-                print(f"\n[CRASH] The compiler broke on input: {repr(text)}")
-                traceback.print_exc()
+            key = type(e).__name__
+            if key not in seen:
+                seen[key] = text
+                if crashes <= 3:
+                    print(f"\n[CRASH] {key} on input: {text!r}")
+                    traceback.print_exc()
 
-    print(f"\n[RESULTS] {iterations} Iterations Completed.")
-    print(f"  - Parsed Successfully: {passed}")
-    print(f"  - Gracefully Rejected (SyntaxError): {syntax_errors}")
-    print(f"  - Compiler Crashes (Unhandled Exceptions): {crashes}")
-    
+    print(f"\n[RESULTS] {iterations} iterations (parse + to_tool_calls + to_english)")
+    print(f"  - Compiled successfully .............. {parsed}")
+    print(f"  - Gracefully rejected (SyntaxError) .. {syntax_errors}")
+    print(f"  - Unhandled crashes .................. {crashes}")
+    for kind, example in seen.items():
+        print(f"      {kind}: e.g. {example!r}")
+
     if crashes == 0:
-        print("\n✅ SUCCESS: The Kona Compiler is mathematically robust against random chaos.")
+        print("\n✅ No unhandled exception reached any stage of the compiler.")
     else:
-        print("\n❌ FAILED: The Kona Compiler has internal state vulnerabilities.")
+        print(f"\n❌ {crashes} inputs crashed the compiler.")
+    return crashes
+
 
 if __name__ == "__main__":
-    fuzz_compiler(10000)
+    print("=" * 62)
+    print(" KONA COMPILER FUZZER (full compile path)")
+    print("=" * 62)
+    sys.exit(1 if fuzz_compiler(10000, seed=None) else 0)
